@@ -1,0 +1,2039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Telegram Report Generator Pro</title>
+  <style>
+    :root{
+      --bg:#f4f7fb; --card:#fff; --line:#d9e2ec; --text:#1f2937; --muted:#6b7280;
+      --primary:#0b5f7a; --shadow:0 10px 25px rgba(15,23,42,.08); --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+    .wrap{max-width:100%;margin:0;padding:18px 20px 28px}
+    .hero{background:linear-gradient(135deg,#0b5f7a,#0f766e);color:#fff;padding:22px 24px;border-radius:24px;box-shadow:var(--shadow);margin-bottom:18px;width:100%}
+    .hero h1{margin:0;font-size:26px}
+    .toolbar{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+    .toolbar button,.toolbar a, button{
+      border:none;border-radius:12px;padding:11px 14px;cursor:pointer;font-weight:700;font-size:14px;text-decoration:none;display:inline-block
+    }
+    .toolbar .active{background:#fff;color:#123}
+    .toolbar .ghostbtn{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.25)}
+    .grid{display:grid;grid-template-columns:minmax(1180px,1.85fr) minmax(360px,.65fr);gap:24px;align-items:start;width:100%}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:22px}
+    .card h2{margin:0 0 14px;font-size:28px}
+    .sub{font-size:14px;color:var(--muted);margin:-4px 0 14px}
+    .section-title{font-size:20px;font-weight:800;margin:18px 0 12px;color:var(--primary)}
+    .switcher{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+    .switcher button{padding:10px 12px;border-radius:12px;border:1px solid #cddae3;background:#fff;color:#123;font-weight:700}
+    .switcher button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .form-grid.two{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:14px}
+    .form-grid.four{grid-template-columns:repeat(4,minmax(0,1fr));align-items:start;gap:14px}
+    label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+    input,select,textarea{width:100%;padding:13px 14px;border:1px solid #cbd5e1;border-radius:14px;font-size:16px;background:#fff;color:var(--text)}
+    textarea{min-height:86px;resize:vertical;line-height:1.45}
+    .field-group{border:1px solid var(--line);border-radius:20px;padding:20px;background:#fbfdff;min-width:0;height:100%}
+    .field-group h3{margin:0 0 14px;font-size:19px}
+    .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+    .primary{background:var(--primary);color:#fff}
+    .secondary{background:#e5eef3;color:#123}
+    .success{background:#dcfce7;color:#166534}
+    .warn{background:#fee2e2;color:#b91c1c}
+    .ghost{background:#f8fafc;color:#334155;border:1px solid #dbe3ec}
+    .mini{padding:7px 10px;font-size:12px}
+    .output{width:100%;min-height:840px;white-space:pre-wrap;font-family:Arial,Helvetica,sans-serif;line-height:1.6;background:#fbfdff;border-radius:16px;padding:18px}
+    .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:16px}
+    .kpi{border:1px solid var(--line);border-radius:18px;padding:16px;background:#fcfdff}
+    .kpi .num{font-size:32px;font-weight:800;margin-bottom:4px;color:var(--primary)}
+    .kpi .lab{color:var(--muted);font-size:12px;font-weight:700}
+    .small{font-size:12px;color:var(--muted)}
+    .chipbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+    .chip{padding:8px 12px;border-radius:999px;border:1px solid #d7e3ea;background:#f6fbfd;color:#0b5f7a;font-size:12px;font-weight:700;cursor:pointer}
+    .chip:hover{background:#ecf7fb}
+    .preset-section{border:1px solid #dbe8ef;border-radius:16px;padding:12px;margin-top:12px;background:#fbfdff}
+    .preset-title{font-size:13px;font-weight:800;margin:0 0 8px;color:#0b5f7a}
+    .chip.good{background:#ecfdf3;color:#166534;border-color:#bbf7d0}
+    .chip.monitor{background:#fffbeb;color:#92400e;border-color:#fde68a}
+    .chip.critical{background:#fef2f2;color:#991b1b;border-color:#fecaca}
+    .chip.action{background:#eef6ff;color:#1d4ed8;border-color:#bfdbfe}
+    .chip.combo{background:#f5f3ff;color:#6d28d9;border-color:#ddd6fe}
+    .chip.advanced{background:#eef2ff;color:#3730a3;border-color:#c7d2fe}
+
+    .history-item{border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:10px;background:#fbfdff}
+    .history-item strong{display:block;margin-bottom:6px}
+    .mono{white-space:pre-wrap;font-size:12px;color:#334155;line-height:1.45;max-height:180px;overflow:auto}
+    .hidden{display:none}
+    .repeat-row{border:1px dashed #cbd5e1;border-radius:16px;padding:16px;margin-bottom:14px;background:#fff}
+    .repeat-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:12px}
+    .repeat-title{font-size:15px;font-weight:700}
+    .settings-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .pill{display:inline-block;padding:5px 9px;border-radius:999px;background:#eef6fa;color:var(--primary);font-size:12px;font-weight:700;margin-bottom:8px}
+
+    .main-stack{display:grid;gap:22px;width:100%}
+    .detail-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:start}
+    .detail-grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
+    .full-width{width:100%}
+
+    .detail-grid-3{grid-template-columns:1fr;gap:22px}
+    .repeat-row .form-grid.three{grid-template-columns:1.15fr 1fr 1fr;gap:18px}
+    .wide-card{width:100%}
+    .span-full{grid-column:1 / -1}
+    .notes-inline{grid-column:1 / -1}
+    .notes-inline textarea{min-height:110px}
+    .notes-inline .chipbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+    .notes-inline .chip{white-space:nowrap}
+    .risk-top{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+    .support-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start;margin-top:14px}
+    .support-grid .span-full{grid-column:1 / -1}
+
+
+    .field-group .compact-4 input,
+    .field-group .compact-2 input,
+    .field-group .form-grid input,
+    .field-group .form-grid textarea,
+    .field-group .compact-4 textarea,
+    .field-group .compact-2 textarea{width:100%}
+
+    .split-main{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;width:100%}
+    .stack-lg{display:grid;gap:20px;width:100%}
+    .compact-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-items:start;width:100%}
+    .compact-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start;width:100%}
+    .field-group textarea{min-height:118px}
+
+    @media (max-width:1400px){.grid,.detail-grid-3,.detail-grid-2{grid-template-columns:1fr}.settings-layout,.split-main{grid-template-columns:1fr}}
+    @media (max-width:1100px){.grid,.settings-layout,.split-main,.detail-grid-3,.detail-grid-2{grid-template-columns:1fr}}
+    @media (max-width:900px){.compact-4{grid-template-columns:1fr 1fr}.compact-2{grid-template-columns:1fr}.detail-grid-3{grid-template-columns:1fr}.detail-grid-2{grid-template-columns:1fr}}
+    @media (max-width:800px){.form-grid,.form-grid.two,.form-grid.four,.kpis{grid-template-columns:1fr 1fr}.compact-4,.compact-2{grid-template-columns:1fr 1fr}}
+    @media (max-width:700px){.risk-top,.support-grid{grid-template-columns:1fr}}
+    @media (max-width:560px){.form-grid,.form-grid.two,.form-grid.four,.kpis,.compact-4,.compact-2{grid-template-columns:1fr}.wrap{padding:12px}.hero h1{font-size:22px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Telegram Report Generator Pro</h1>
+      <div class="toolbar">
+        <button id="navMain" class="active" onclick="showView('main')">📊 Main</button>
+        <button id="navSettings" class="ghostbtn" onclick="showView('settings')">⚙️ Settings</button>
+      </div>
+    </div>
+
+    <div id="mainView">
+      <div class="grid">
+        <div class="card">
+          <h2>Report Builder</h2>
+          <div class="sub">Fast daily use. Titles and emojis are hidden here and can be edited in Settings.</div>
+
+          <div class="switcher">
+            <button id="btnMorning" class="active" onclick="setMode('morning')">Morning Report</button>
+            <button id="btnProgress" onclick="setMode('progress')">Progress Report</button>
+            <button id="btnClosing" onclick="setMode('closing')">Closing Report</button>
+            <button id="btnGemba" onclick="setMode('gemba')">Gemba Notes</button>
+          </div>
+
+          <div class="section-title">Header</div>
+          <div class="form-grid three">
+            <div><label for="station">Station / Site</label><input id="station" placeholder=""></div>
+            <div><label for="reportDate">Date</label><input id="reportDate" type="date"></div>
+            <div><label for="reportTime">Report time</label>
+              <select id="reportTime"><option>12:00 PM</option><option>2:00 PM</option><option>4:00 PM</option><option selected>6:00 PM</option><option>8:00 PM</option></select>
+            </div>
+          </div>
+
+          <div id="morningFields">
+            <div class="section-title">Morning Report</div>
+            <div class="main-stack">
+              <div class="field-group full-width">
+                <h3>Main counts</h3>
+                <div class="compact-4">
+                  <div><label for="phones">Phones</label><input id="phones" type="number" placeholder=""></div>
+                  <div><label for="chargers">Chargers</label><input id="chargers" type="number" placeholder=""></div>
+                  <div><label for="gasCards">Gas cards</label><input id="gasCards" type="number" placeholder=""></div>
+                  <div><label for="routesMorning">Routes</label><input id="routesMorning" type="number" placeholder=""></div>
+
+                  <div><label for="totalPackagesMorning">Total packages</label><input id="totalPackagesMorning" type="number" placeholder=""></div>
+                  <div><label for="remainingMorning">Remaining</label><input id="remainingMorning" type="number" placeholder=""></div>
+                  <div><label for="stopMorning">Stop progress %</label><input id="stopMorning" type="number" placeholder=""></div>
+                  <div><label for="packageMorning">Package progress %</label><input id="packageMorning" type="number" placeholder=""></div>
+
+                  <div><label for="attemptMorning">Attempt success %</label><input id="attemptMorning" type="number" placeholder=""></div>
+                </div>
+              </div>
+
+              <div class="field-group full-width">
+                <h3>Operation sections</h3>
+                <div class="compact-2">
+                  <div><label for="dailyLog">Daily Log / LMD Max</label><textarea id="dailyLog" placeholder=""></textarea></div>
+                  <div><label for="geotab">GEOTAB</label><textarea id="geotab" placeholder=""></textarea></div>
+                  <div><label for="callOuts">Call outs</label><textarea id="callOuts" placeholder=""></textarea></div>
+                  <div><label for="late">Late</label><textarea id="late" placeholder=""></textarea></div>
+                  <div><label for="netradyne">Netradyne</label><textarea id="netradyne" placeholder=""></textarea></div>
+                  <div><label for="loadout">Load out</label><textarea id="loadout" placeholder=""></textarea></div>
+                  <div class="span-full notes-inline"><label for="notes">Notes</label><textarea id="notes" placeholder=""></textarea>
+<!-- AUTO_NOTES_notes -->
+<div class="preset-section"><div class="preset-title">✅ Morning smooth</div><div class="chipbar">
+<button type="button" class="chip good" onclick='addNotePreset("notes", "Load out was smooth with no issues today")'>Smooth load out</button>
+<button type="button" class="chip good" onclick='addNotePreset("notes", "Both waves dispatched with no major issues")'>Both waves dispatched</button>
+<button type="button" class="chip good" onclick='addNotePreset("notes", "Phones and chargers were checked and organized")'>Devices organized</button>
+<button type="button" class="chip good" onclick='addNotePreset("notes", "No carts reported missing and staging was on time")'>Staging on time</button>
+<button type="button" class="chip good" onclick='addNotePreset("notes", "Routes were prepared and ready for dispatch")'>Routes prepared</button>
+<button type="button" class="chip good" onclick='addNotePreset("notes", "Drivers checked in and were ready for stand-up")'>Drivers checked in</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">👀 Morning monitor</div><div class="chipbar">
+<button type="button" class="chip monitor" onclick='addNotePreset("notes", "Daily log and LMD Max are in progress")'>Daily log in progress</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("notes", "Monitoring device readiness and driver check-in")'>Monitoring readiness</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("notes", "Late arrivals are being monitored and documented")'>Late arrivals monitored</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("notes", "Call outs have been reviewed and coverage is being adjusted")'>Call outs reviewed</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("notes", "Support is pending for any last-minute route changes")'>Support pending</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🧠 Morning actions</div><div class="chipbar">
+<button type="button" class="chip action" onclick='addNotePreset("notes", "Dispatch will continue monitoring start-up performance")'>Continue monitoring</button>
+<button type="button" class="chip action" onclick='addNotePreset("notes", "Drivers were informed of key operational updates during stand-up")'>Drivers informed</button>
+<button type="button" class="chip action" onclick='addNotePreset("notes", "Phones and chargers were assigned based on route list")'>Phones assigned</button>
+<button type="button" class="chip action" onclick='addNotePreset("notes", "Route coverage was adjusted based on attendance and availability")'>Coverage adjusted</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🔧 Technical notes</div><div class="chipbar">
+<button type="button" class="chip technical" onclick='addNotePreset("notes", "Amazon Flex was checked and devices were ready for route assignment")'>Flex checked</button>
+<button type="button" class="chip technical" onclick='addNotePreset("notes", "LMD Max was reviewed for route and driver status")'>LMD Max checked</button>
+<button type="button" class="chip technical" onclick='addNotePreset("notes", "GEOTAB was reviewed for vehicle readiness and compliance")'>GEOTAB reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("notes", "Any device issue was documented for follow-up")'>Device issue logged</button>
+</div></div>
+<!-- END_AUTO_NOTES_notes -->
+<!-- ADVANCED_NOTES_notes -->
+<div class="preset-section advanced-notes"><div class="preset-title">🟣 Advanced Operation Notes</div>
+<div class="preset-title" style="margin-top:10px;">🟣 Advanced Performance / Stability</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Operational performance remains stable across all active routes.")'>Operation stable across routes</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "No significant operational risks have been identified at this time.")'>No major risks identified</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Execution metrics are aligned with expected operational standards.")'>Execution within expectations</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Performance remains consistent with current operational expectations.")'>Performance remains consistent</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">👀 Advanced Monitoring / Control</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Route-level performance is being actively monitored by dispatch.")'>Monitoring route performance</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Delivery exceptions are being tracked and reviewed in real time.")'>Monitoring delivery exceptions</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Driver compliance and execution behavior are under active monitoring.")'>Monitoring driver compliance</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Dispatch is monitoring real-time execution data to identify potential deviations.")'>Real-time monitoring</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">🚨 Advanced Issues / Impact</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Delivery exceptions are showing an increasing trend and are under review.")'>Delivery exceptions increasing</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Current package volume is impacting overall route execution efficiency.")'>Volume impacting performance</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Localized delays have been identified in specific delivery zones.")'>Localized delays</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Performance deviation has been identified and is being actively evaluated.")'>Performance deviation</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">🔧 Advanced Dispatch Actions</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Dispatch is actively engaged in monitoring and supporting route execution.")'>Dispatch actively engaged</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Operational support is being deployed to maintain performance levels.")'>Support being deployed</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Operational adjustments are currently in progress to stabilize execution.")'>Adjustments in progress</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Escalation is in progress to maintain operational visibility and support.")'>Escalation in progress</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">🧠 Advanced Analysis / Intelligence</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Operational performance is under continuous review based on real-time data.")'>Performance under review</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Dispatch decisions are being guided by real-time performance data.")'>Data-driven monitoring</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "A performance trend has been identified and is being evaluated.")'>Trend identified</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Exception trends are being reviewed to identify recurring operational barriers.")'>Exception trend review</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">🔥 Advanced Combo</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Operation remains stable with no significant risks. Dispatch will continue monitoring execution to ensure consistency.")'>Stable operation</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Minor performance deviations have been identified. Dispatch is monitoring closely and providing support where needed.")'>Moderate risk</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notes", "Operational challenges have been identified. Dispatch is actively managing risk, assigning support, and monitoring performance closely.")'>High attention</button>
+</div>
+</div>
+<!-- END_ADVANCED_NOTES_notes -->
+                    <div class="preset-section">
+                      <div class="preset-title">✅ Morning smooth</div>
+                      <div class="chipbar">
+                        <button type="button" class="chip good" onclick="addNotePreset('notes','Load out was smooth with no issues today')">Smooth load out</button>
+                        <button type="button" class="chip good" onclick="addNotePreset('notes','Both waves dispatched with no major issues')">Both waves dispatched</button>
+                        <button type="button" class="chip good" onclick="addNotePreset('notes','Phones and chargers were checked and organized')">Devices organized</button>
+                        <button type="button" class="chip good" onclick="addNotePreset('notes','No carts reported missing and staging was on time')">Staging on time</button>
+                      </div>
+                    </div>
+                    <div class="preset-section">
+                      <div class="preset-title">👀 Morning monitor</div>
+                      <div class="chipbar">
+                        <button type="button" class="chip monitor" onclick="addNotePreset('notes','Daily log and LMD Max are in progress')">Daily log in progress</button>
+                        <button type="button" class="chip monitor" onclick="addNotePreset('notes','Monitoring device readiness and driver check-in')">Monitoring readiness</button>
+                        <button type="button" class="chip action" onclick="addNotePreset('notes','Dispatch will continue monitoring start-up performance')">Continue monitoring</button>
+                      </div>
+                    </div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          
+          <div id="progressFields" class="hidden">
+            <div class="section-title">Progress Report</div>
+            <div class="main-stack">
+              <div class="field-group full-width">
+                <h3>Main progress</h3>
+                <div class="compact-4">
+                  <div><label for="remaining">Remaining</label><input id="remaining" type="number" placeholder=""></div>
+                  <div><label for="routes">Routes</label><input id="routes" type="number" placeholder=""></div>
+                  <div><label for="stopProgress">Stop progress %</label><input id="stopProgress" type="number" placeholder=""></div>
+                  <div><label for="packageProgress">Package progress %</label><input id="packageProgress" type="number" placeholder=""></div>
+
+                  <div><label for="attemptSuccess">Attempt success %</label><input id="attemptSuccess" type="number" placeholder=""></div>
+                  <div><label for="locationsProgress">Locations progress %</label><input id="locationsProgress" type="number" placeholder=""></div>
+                  <div><label for="reattemptable">Reattemptable</label><input id="reattemptable" type="number" placeholder=""></div>
+                  <div><label for="missing">Missing</label><input id="missing" type="number" placeholder=""></div>
+
+                  <div><label for="undeliverable">Undeliverable</label><input id="undeliverable" type="number" placeholder=""></div>
+                  <div><label for="returned">Returned to station</label><input id="returned" type="number" placeholder=""></div>
+                  <div><label for="pickupFailed">Pickup failed</label><input id="pickupFailed" type="number" placeholder=""></div>
+                  <div><label for="infractions">Infractions</label><input id="infractions" type="number" placeholder=""></div>
+                </div>
+              </div>
+
+              <div class="field-group full-width">
+                <h3>Reattemptable details</h3>
+                <div id="reattemptableRows"></div>
+                <button class="ghost mini" type="button" onclick="addRepeatRow('reattemptableRows','reattemptable')">+ Add reattemptable</button>
+              </div>
+
+              <div class="field-group full-width">
+                <h3>Missing details</h3>
+                <div id="missingRows"></div>
+                <button class="ghost mini" type="button" onclick="addRepeatRow('missingRows','missing')">+ Add missing</button>
+              </div>
+
+              <div class="field-group full-width">
+                <h3>Infractions details</h3>
+                <div id="infractionsRows"></div>
+                <button class="ghost mini" type="button" onclick="addRepeatRow('infractionsRows','infraction')">+ Add infraction</button>
+              </div>
+
+              <div class="field-group full-width">
+                <h3>Risk and support</h3>
+                <div class="risk-top">
+                  <div><label for="ahead">Ahead</label><input id="ahead" type="number" placeholder=""></div>
+                  <div><label for="atRiskNum">At risk</label><input id="atRiskNum" type="number" placeholder=""></div>
+                  <div><label for="behindNum">Behind</label><input id="behindNum" type="number" placeholder=""></div>
+                </div>
+                <div class="support-grid">
+                  <div><label for="rescuePlan">Rescue plan</label><textarea id="rescuePlan" placeholder=""></textarea></div>
+                  <div><label for="behindNames">Behind names</label><textarea id="behindNames" placeholder=""></textarea></div>
+                  <div><label for="atRiskNames">At risk names</label><textarea id="atRiskNames" placeholder=""></textarea></div>
+                  <div><label for="missingNames">Other missing notes</label><textarea id="missingNames" placeholder=""></textarea></div>
+                  <div class="span-full notes-inline"><label for="notesProgress">Notes</label><textarea id="notesProgress" placeholder=""></textarea>
+<!-- AUTO_NOTES_notesProgress -->
+<div class="preset-section"><div class="preset-title">✅ Good</div><div class="chipbar">
+<button type="button" class="chip good" onclick='addNotePreset("notesProgress", "Operation is stable at this time")'>Operation stable</button>
+<button type="button" class="chip good" onclick='addNotePreset("notesProgress", "All routes are progressing as expected")'>Routes as expected</button>
+<button type="button" class="chip good" onclick='addNotePreset("notesProgress", "High attempt success is being maintained")'>High attempt success</button>
+<button type="button" class="chip good" onclick='addNotePreset("notesProgress", "No major delivery issues reported at this time")'>No major issues</button>
+<button type="button" class="chip good" onclick='addNotePreset("notesProgress", "Progress remains steady across the operation")'>Steady progress</button>
+<button type="button" class="chip good" onclick='addNotePreset("notesProgress", "No major risks identified at this time")'>Low risk</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">👀 Monitor</div><div class="chipbar">
+<button type="button" class="chip monitor" onclick='addNotePreset("notesProgress", "Monitoring a few routes closely")'>Monitoring routes</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("notesProgress", "A few drivers are slightly behind but under control")'>Slightly behind</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("notesProgress", "Access problems continue to be the main issue for some deliveries")'>Access issues</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("notesProgress", "Business closed locations are impacting some routes")'>Business closed</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("notesProgress", "OTP deliveries are causing some delays")'>OTP delays</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("notesProgress", "Reattemptable packages are being monitored and followed up")'>Reattempts monitored</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("notesProgress", "Missing packages are being reviewed and tracked")'>Missing review</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🚨 Critical</div><div class="chipbar">
+<button type="button" class="chip critical" onclick='addNotePreset("notesProgress", "Several routes are falling behind and are being monitored closely")'>Routes falling behind</button>
+<button type="button" class="chip critical" onclick='addNotePreset("notesProgress", "Multiple access problems reported across routes")'>Multiple access problems</button>
+<button type="button" class="chip critical" onclick='addNotePreset("notesProgress", "High number of missing packages under review")'>High missing review</button>
+<button type="button" class="chip critical" onclick='addNotePreset("notesProgress", "Rescue support has been escalated due to route progress")'>Rescue escalated</button>
+<button type="button" class="chip critical" onclick='addNotePreset("notesProgress", "Pickup Fail is impacting the current progress and is being reviewed")'>Pickup fail impact</button>
+<button type="button" class="chip critical" onclick='addNotePreset("notesProgress", "PNOV concerns are being reviewed and drivers are being contacted")'>PNOV concern</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🧠 Actions</div><div class="chipbar">
+<button type="button" class="chip action" onclick='addNotePreset("notesProgress", "Dispatch will continue monitoring performance and follow up as needed")'>Continue monitoring</button>
+<button type="button" class="chip action" onclick='addNotePreset("notesProgress", "Rescues have been assigned where needed")'>Rescues assigned</button>
+<button type="button" class="chip action" onclick='addNotePreset("notesProgress", "Drivers have been contacted and coached")'>Drivers contacted</button>
+<button type="button" class="chip action" onclick='addNotePreset("notesProgress", "Issue documented for review")'>Documented</button>
+<button type="button" class="chip action" onclick='addNotePreset("notesProgress", "Follow-up will be completed with impacted drivers")'>Follow-up pending</button>
+<button type="button" class="chip action" onclick='addNotePreset("notesProgress", "Leadership has been updated on the current situation")'>Leadership notified</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🔧 Technical / Cortex</div><div class="chipbar">
+<button type="button" class="chip technical" onclick='addNotePreset("notesProgress", "Cortex was reviewed for execution progress and package status")'>Cortex reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("notesProgress", "Route status was reviewed for ahead, at-risk, and behind drivers")'>Route status checked</button>
+<button type="button" class="chip technical" onclick='addNotePreset("notesProgress", "TBAs were reviewed and documented for follow-up")'>TBA review</button>
+<button type="button" class="chip technical" onclick='addNotePreset("notesProgress", "Package status was reviewed for reattemptable, missing, and undeliverable packages")'>Package status review</button>
+<button type="button" class="chip technical" onclick='addNotePreset("notesProgress", "Rescue plan was updated based on current route progress")'>Rescue plan updated</button>
+<button type="button" class="chip technical" onclick='addNotePreset("notesProgress", "Possible geo/PIN or access-related issue identified and documented")'>Geo/PIN issue</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🟣 Combo</div><div class="chipbar">
+<button type="button" class="chip combo" onclick='addNotePreset("notesProgress", "Operation is stable at this time. No major risks identified. Dispatch will continue monitoring performance.")'>Stable combo</button>
+<button type="button" class="chip combo" onclick='addNotePreset("notesProgress", "A few routes are being monitored closely. Support will be assigned if progress does not improve.")'>Monitor combo</button>
+<button type="button" class="chip combo" onclick='addNotePreset("notesProgress", "Access issues and reattemptable packages are being reviewed. Drivers will be contacted as needed.")'>Issue combo</button>
+</div></div>
+<!-- END_AUTO_NOTES_notesProgress -->
+<div class="chipbar"><button type="button" class="chip advanced" onclick="applyAutoAdvancedNotes()">✨ Auto Advanced</button></div>
+<!-- ADVANCED_NOTES_notesProgress -->
+<div class="preset-section advanced-notes"><div class="preset-title">🟣 Advanced Operation Notes</div>
+<div class="preset-title" style="margin-top:10px;">🟣 Advanced Performance / Stability</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Operational performance remains stable across all active routes.")'>Operation stable across routes</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "No significant operational risks have been identified at this time.")'>No major risks identified</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Execution metrics are aligned with expected operational standards.")'>Execution within expectations</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Performance remains consistent with current operational expectations.")'>Performance remains consistent</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">👀 Advanced Monitoring / Control</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Route-level performance is being actively monitored by dispatch.")'>Monitoring route performance</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Delivery exceptions are being tracked and reviewed in real time.")'>Monitoring delivery exceptions</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Driver compliance and execution behavior are under active monitoring.")'>Monitoring driver compliance</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Dispatch is monitoring real-time execution data to identify potential deviations.")'>Real-time monitoring</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">🚨 Advanced Issues / Impact</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Delivery exceptions are showing an increasing trend and are under review.")'>Delivery exceptions increasing</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Current package volume is impacting overall route execution efficiency.")'>Volume impacting performance</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Localized delays have been identified in specific delivery zones.")'>Localized delays</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Performance deviation has been identified and is being actively evaluated.")'>Performance deviation</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">🔧 Advanced Dispatch Actions</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Dispatch is actively engaged in monitoring and supporting route execution.")'>Dispatch actively engaged</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Operational support is being deployed to maintain performance levels.")'>Support being deployed</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Operational adjustments are currently in progress to stabilize execution.")'>Adjustments in progress</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Escalation is in progress to maintain operational visibility and support.")'>Escalation in progress</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">🧠 Advanced Analysis / Intelligence</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Operational performance is under continuous review based on real-time data.")'>Performance under review</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Dispatch decisions are being guided by real-time performance data.")'>Data-driven monitoring</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "A performance trend has been identified and is being evaluated.")'>Trend identified</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Exception trends are being reviewed to identify recurring operational barriers.")'>Exception trend review</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">🔥 Advanced Combo</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Operation remains stable with no significant risks. Dispatch will continue monitoring execution to ensure consistency.")'>Stable operation</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Minor performance deviations have been identified. Dispatch is monitoring closely and providing support where needed.")'>Moderate risk</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesProgress", "Operational challenges have been identified. Dispatch is actively managing risk, assigning support, and monitoring performance closely.")'>High attention</button>
+</div>
+</div>
+<!-- END_ADVANCED_NOTES_notesProgress -->
+                    <div class="chipbar"><button type="button" class="chip combo" onclick="applySmartProgressNotes()">✨ Smart suggestions</button></div>
+                    <div class="preset-section">
+                      <div class="preset-title">✅ Good</div>
+                      <div class="chipbar">
+                        <button type="button" class="chip good" onclick="addNotePreset('notesProgress','Operation is stable at this time')">Operation stable</button>
+                        <button type="button" class="chip good" onclick="addNotePreset('notesProgress','All routes are progressing as expected')">Routes as expected</button>
+                        <button type="button" class="chip good" onclick="addNotePreset('notesProgress','High attempt success is being maintained')">High attempt success</button>
+                        <button type="button" class="chip good" onclick="addNotePreset('notesProgress','No major delivery issues reported at this time')">No major issues</button>
+                      </div>
+                    </div>
+                    <div class="preset-section">
+                      <div class="preset-title">👀 Monitor</div>
+                      <div class="chipbar">
+                        <button type="button" class="chip monitor" onclick="addNotePreset('notesProgress','Monitoring a few routes closely')">Monitoring routes</button>
+                        <button type="button" class="chip monitor" onclick="addNotePreset('notesProgress','A few drivers are slightly behind but under control')">Slightly behind</button>
+                        <button type="button" class="chip monitor" onclick="addNotePreset('notesProgress','Access problems continue to be the main issue for some deliveries')">Access issues</button>
+                        <button type="button" class="chip monitor" onclick="addNotePreset('notesProgress','Business closed locations are impacting some routes')">Business closed</button>
+                      </div>
+                    </div>
+                    <div class="preset-section">
+                      <div class="preset-title">🚨 Critical</div>
+                      <div class="chipbar">
+                        <button type="button" class="chip critical" onclick="addNotePreset('notesProgress','Several routes are falling behind and are being monitored closely')">Routes falling behind</button>
+                        <button type="button" class="chip critical" onclick="addNotePreset('notesProgress','Multiple access problems reported across routes')">Multiple access problems</button>
+                        <button type="button" class="chip critical" onclick="addNotePreset('notesProgress','High number of missing packages under review')">High missing review</button>
+                        <button type="button" class="chip critical" onclick="addNotePreset('notesProgress','OTP deliveries are causing delays')">OTP delays</button>
+                      </div>
+                    </div>
+                    <div class="preset-section">
+                      <div class="preset-title">🧠 Actions</div>
+                      <div class="chipbar">
+                        <button type="button" class="chip action" onclick="addNotePreset('notesProgress','Dispatch will continue monitoring performance and follow up as needed')">Continue monitoring</button>
+                        <button type="button" class="chip action" onclick="addNotePreset('notesProgress','Rescues have been assigned where needed')">Rescues assigned</button>
+                        <button type="button" class="chip action" onclick="addNotePreset('notesProgress','Drivers have been contacted and coached')">Drivers contacted</button>
+                        <button type="button" class="chip action" onclick="addNotePreset('notesProgress','Issue documented for review')">Documented</button>
+                        <button type="button" class="chip combo" onclick="addNotePreset('notesProgress','Operation is stable at this time. No major risks identified. Dispatch will continue monitoring performance.')">Stable combo</button>
+                      </div>
+                    </div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+<div id="closingFields" class="hidden">
+            <div class="section-title">Closing Report</div>
+            <div class="main-stack">
+              <div class="field-group full-width">
+                <h3>Closing information</h3>
+                <div class="compact-2">
+                  <div><label for="prePostInspections">Pre/Post inspections</label><textarea id="prePostInspections" placeholder=""></textarea></div>
+                  <div><label for="rtsSummary">RTS summary</label><textarea id="rtsSummary" placeholder=""></textarea></div>
+                  <div><label for="eventsClosing">Events</label><textarea id="eventsClosing" placeholder=""></textarea></div>
+                  <div><label for="cageStatus">Cage / devices status</label><textarea id="cageStatus" placeholder=""></textarea></div>
+                </div>
+              </div>
+
+              <div class="field-group full-width">
+                <h3>Counts and wrap-up</h3>
+                <div class="compact-4">
+                  <div><label for="rtsReturned">RTS returned</label><input id="rtsReturned" type="number" placeholder=""></div>
+                  <div><label for="rtsGoal">RTS goal</label><input id="rtsGoal" type="number" placeholder=""></div>
+                  <div><label for="closingPhones">Phones</label><input id="closingPhones" type="number" placeholder=""></div>
+                  <div><label for="closingChargers">Chargers</label><input id="closingChargers" type="number" placeholder=""></div>
+                </div>
+                <div class="compact-2" style="margin-top:10px;">
+                  <div><label for="completedTasks">Completed tasks</label><textarea id="completedTasks" placeholder=""></textarea></div>
+                  <div><label for="pickupsClosing">Pickups</label><textarea id="pickupsClosing" placeholder=""></textarea></div>
+                  <div><label for="closingExtra">Extra closing note</label><textarea id="closingExtra" placeholder=""></textarea></div>
+                  <div><label for="resetClosing">Reset / handoff</label><textarea id="resetClosing" placeholder=""></textarea></div>
+                  <div class="span-full notes-inline"><label for="notesClosing">Notes</label><textarea id="notesClosing" placeholder=""></textarea>
+<!-- AUTO_NOTES_notesClosing -->
+<div class="preset-section"><div class="preset-title">✅ Closing complete</div><div class="chipbar">
+<button type="button" class="chip good" onclick='addNotePreset("notesClosing", "All pre and post inspections cleared out for tonight \u2705")'>Inspections cleared</button>
+<button type="button" class="chip good" onclick='addNotePreset("notesClosing", "No new infractions \u2705")'>No new infractions</button>
+<button type="button" class="chip good" onclick='addNotePreset("notesClosing", "All pickups were successful today and have been submitted to Slack.")'>Pickups successful</button>
+<button type="button" class="chip good" onclick='addNotePreset("notesClosing", "Cage locked and secured with all devices charged / charging")'>Cage secured</button>
+<button type="button" class="chip good" onclick='addNotePreset("notesClosing", "No severe events today")'>No severe events</button>
+<button type="button" class="chip good" onclick='addNotePreset("notesClosing", "Operation completed for tonight with no major pending issues")'>Operation completed</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🧠 Closing tasks</div><div class="chipbar">
+<button type="button" class="chip action" onclick='addNotePreset("notesClosing", "Daily log completed \u2705")'>Daily log completed</button>
+<button type="button" class="chip action" onclick='addNotePreset("notesClosing", "Rescues uploaded to MAX \u2705")'>Rescues uploaded</button>
+<button type="button" class="chip action" onclick='addNotePreset("notesClosing", "RTS tracker updated \u2705")'>RTS updated</button>
+<button type="button" class="chip action" onclick='addNotePreset("notesClosing", "Sweeper tracker updated \u2705")'>Sweeper updated</button>
+<button type="button" class="chip action" onclick='addNotePreset("notesClosing", "Write-up tracker completed \u2705")'>Write-up completed</button>
+<button type="button" class="chip action" onclick='addNotePreset("notesClosing", "Daily report emailed \u2705")'>Daily report emailed</button>
+<button type="button" class="chip action" onclick='addNotePreset("notesClosing", "All has been reset for our morning team! Goodnight everyone \ud83d\udc97")'>Morning reset</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">👀 Closing monitor</div><div class="chipbar">
+<button type="button" class="chip monitor" onclick='addNotePreset("notesClosing", "RTS is being tracked and pending final confirmation")'>RTS pending</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("notesClosing", "Returns are being monitored and updated in the tracker")'>Returns monitored</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("notesClosing", "Devices are charging and will be ready for the morning team")'>Devices charging</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("notesClosing", "Pending items have been documented for follow-up")'>Pending follow-up</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🔧 Technical closing</div><div class="chipbar">
+<button type="button" class="chip technical" onclick='addNotePreset("notesClosing", "All operational trackers were reviewed and updated")'>Tracker updated</button>
+<button type="button" class="chip technical" onclick='addNotePreset("notesClosing", "MAX was updated with rescue and route information")'>MAX updated</button>
+<button type="button" class="chip technical" onclick='addNotePreset("notesClosing", "Required updates and pickup confirmations were submitted to Slack")'>Slack submitted</button>
+<button type="button" class="chip technical" onclick='addNotePreset("notesClosing", "Device and charger counts were checked before closing")'>Device count checked</button>
+</div></div>
+<!-- END_AUTO_NOTES_notesClosing -->
+<!-- ADVANCED_NOTES_notesClosing -->
+<div class="preset-section advanced-notes"><div class="preset-title">🟣 Advanced Operation Notes</div>
+<div class="preset-title" style="margin-top:10px;">🟣 Advanced Performance / Stability</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Operational performance remains stable across all active routes.")'>Operation stable across routes</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "No significant operational risks have been identified at this time.")'>No major risks identified</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Execution metrics are aligned with expected operational standards.")'>Execution within expectations</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Performance remains consistent with current operational expectations.")'>Performance remains consistent</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">👀 Advanced Monitoring / Control</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Route-level performance is being actively monitored by dispatch.")'>Monitoring route performance</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Delivery exceptions are being tracked and reviewed in real time.")'>Monitoring delivery exceptions</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Driver compliance and execution behavior are under active monitoring.")'>Monitoring driver compliance</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Dispatch is monitoring real-time execution data to identify potential deviations.")'>Real-time monitoring</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">🚨 Advanced Issues / Impact</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Delivery exceptions are showing an increasing trend and are under review.")'>Delivery exceptions increasing</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Current package volume is impacting overall route execution efficiency.")'>Volume impacting performance</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Localized delays have been identified in specific delivery zones.")'>Localized delays</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Performance deviation has been identified and is being actively evaluated.")'>Performance deviation</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">🔧 Advanced Dispatch Actions</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Dispatch is actively engaged in monitoring and supporting route execution.")'>Dispatch actively engaged</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Operational support is being deployed to maintain performance levels.")'>Support being deployed</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Operational adjustments are currently in progress to stabilize execution.")'>Adjustments in progress</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Escalation is in progress to maintain operational visibility and support.")'>Escalation in progress</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">🧠 Advanced Analysis / Intelligence</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Operational performance is under continuous review based on real-time data.")'>Performance under review</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Dispatch decisions are being guided by real-time performance data.")'>Data-driven monitoring</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "A performance trend has been identified and is being evaluated.")'>Trend identified</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Exception trends are being reviewed to identify recurring operational barriers.")'>Exception trend review</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">🔥 Advanced Combo</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Operation remains stable with no significant risks. Dispatch will continue monitoring execution to ensure consistency.")'>Stable operation</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Minor performance deviations have been identified. Dispatch is monitoring closely and providing support where needed.")'>Moderate risk</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("notesClosing", "Operational challenges have been identified. Dispatch is actively managing risk, assigning support, and monitoring performance closely.")'>High attention</button>
+</div>
+</div>
+<!-- END_ADVANCED_NOTES_notesClosing -->
+                    <div class="preset-section">
+                      <div class="preset-title">✅ Closing complete</div>
+                      <div class="chipbar">
+                        <button type="button" class="chip good" onclick="addNotePreset('notesClosing','All pre and post inspections cleared out for tonight ✅')">Inspections cleared</button>
+                        <button type="button" class="chip good" onclick="addNotePreset('notesClosing','No new infractions ✅')">No new infractions</button>
+                        <button type="button" class="chip good" onclick="addNotePreset('notesClosing','All pickups were successful today and have been submitted to Slack.')">Pickups successful</button>
+                        <button type="button" class="chip good" onclick="addNotePreset('notesClosing','Cage locked and secured with all devices charged / charging')">Cage secured</button>
+                      </div>
+                    </div>
+                    <div class="preset-section">
+                      <div class="preset-title">🧠 Closing tasks</div>
+                      <div class="chipbar">
+                        <button type="button" class="chip action" onclick="addNotePreset('notesClosing','Daily log completed ✅')">Daily log completed</button>
+                        <button type="button" class="chip action" onclick="addNotePreset('notesClosing','Rescues uploaded to MAX ✅')">Rescues uploaded</button>
+                        <button type="button" class="chip action" onclick="addNotePreset('notesClosing','RTS tracker updated ✅')">RTS updated</button>
+                        <button type="button" class="chip action" onclick="addNotePreset('notesClosing','Sweeper tracker updated ✅')">Sweeper updated</button>
+                        <button type="button" class="chip combo" onclick="addNotePreset('notesClosing','All has been reset for our morning team! Goodnight everyone 💗')">Morning reset</button>
+                      </div>
+                    </div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div id="gembaFields" class="hidden">
+            <div class="section-title">Gemba Notes</div>
+            <div class="main-stack">
+              <div class="field-group full-width">
+                <h3>Gemba header</h3>
+                <div class="compact-4">
+                  <div>
+                    <label for="gembaTime">Gemba time</label>
+                    <select id="gembaTime">
+                      <option>3pm</option>
+                      <option>5pm</option>
+                      <option>7pm</option>
+                    </select>
+                  </div>
+                  <div><label for="gembaSite">Site</label><input id="gembaSite" value="CASN" placeholder=""></div>
+                  <div><label for="gembaTitle">Title</label><input id="gembaTitle" value="Gemba Notes" placeholder=""></div>
+                  <div><label for="gembaIntro">Intro</label><input id="gembaIntro" value="Please update us on the following:" placeholder=""></div>
+                </div>
+              </div>
+
+              <div class="field-group full-width">
+                <h3>Checklist</h3>
+                <div class="support-grid">
+                  <div>
+                    <label for="gembaPickupFail">Pickup Fail / PuF status</label>
+                    <textarea id="gembaPickupFail" placeholder=""></textarea>
+<!-- AUTO_NOTES_gembaPickupFail -->
+<div class="preset-section"><div class="preset-title">✅ Clear status</div><div class="chipbar">
+<button type="button" class="chip good" onclick='addNotePreset("gembaPickupFail", "No issues reported at this time")'>No issues</button>
+<button type="button" class="chip good" onclick='addNotePreset("gembaPickupFail", "Status is clear and under control")'>Under control</button>
+<button type="button" class="chip good" onclick='addNotePreset("gembaPickupFail", "Confirmed and completed")'>Confirmed complete</button>
+<button type="button" class="chip good" onclick='addNotePreset("gembaPickupFail", "No elevated risk reported at this time")'>No elevated risk</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">👀 Monitor</div><div class="chipbar">
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaPickupFail", "Currently being monitored by dispatch")'>Being monitored</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaPickupFail", "Pending driver confirmation")'>Pending confirmation</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaPickupFail", "Follow-up in progress")'>Follow-up in progress</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaPickupFail", "Drivers are being contacted for confirmation")'>Drivers being contacted</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaPickupFail", "Awaiting pictures for confirmation")'>Awaiting pictures</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🧠 Actions</div><div class="chipbar">
+<button type="button" class="chip action" onclick='addNotePreset("gembaPickupFail", "Driver has been contacted")'>Driver contacted</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaPickupFail", "Support has been assigned where needed")'>Support assigned</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaPickupFail", "Pictures have been submitted for confirmation")'>Pictures submitted</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaPickupFail", "Volume has been confirmed and collected")'>Volume confirmed</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaPickupFail", "Issue has been escalated for visibility")'>Escalated</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🔧 Gemba technical</div><div class="chipbar">
+<button type="button" class="chip technical" onclick='addNotePreset("gembaPickupFail", "Pickup Fail status was reviewed and impacted drivers were checked")'>PuF reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaPickupFail", "PNOV status was reviewed and impacted drivers were checked")'>PNOV reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaPickupFail", "CRET / Whole Foods pickup status was reviewed")'>CRET reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaPickupFail", "On-road risk and drivers behind were reviewed")'>Road risk reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaPickupFail", "Plan of action was documented and will be monitored")'>Plan documented</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🟣 Combo</div><div class="chipbar">
+<button type="button" class="chip combo" onclick='addNotePreset("gembaPickupFail", "No issues reported at this time. Dispatch will continue monitoring and follow up as needed.")'>Clear combo</button>
+<button type="button" class="chip combo" onclick='addNotePreset("gembaPickupFail", "Whole Foods pickup status reviewed. Volume confirmation and pictures are being monitored.")'>WF combo</button>
+<button type="button" class="chip combo" onclick='addNotePreset("gembaPickupFail", "On-road risk reviewed. Drivers behind are being monitored and support will be assigned if needed.")'>Risk combo</button>
+</div></div>
+<!-- END_AUTO_NOTES_gembaPickupFail -->
+                    <div class="chipbar">
+                      <button type="button" class="chip" onclick="addNotePreset('gembaPickupFail','No elevated PuF issues reported at this time')">No elevated PuF</button>
+                      <button type="button" class="chip" onclick="addNotePreset('gembaPickupFail','Drivers with elevated PuFs have been contacted')">Drivers contacted</button>
+                      <button type="button" class="chip" onclick="addNotePreset('gembaPickupFail','Monitoring DAs currently flagging for Pickup Fail')">Monitoring PuF</button>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="gembaPnov">PNOV status</label>
+                    <textarea id="gembaPnov" placeholder=""></textarea>
+<!-- AUTO_NOTES_gembaPnov -->
+<div class="preset-section"><div class="preset-title">✅ Clear status</div><div class="chipbar">
+<button type="button" class="chip good" onclick='addNotePreset("gembaPnov", "No issues reported at this time")'>No issues</button>
+<button type="button" class="chip good" onclick='addNotePreset("gembaPnov", "Status is clear and under control")'>Under control</button>
+<button type="button" class="chip good" onclick='addNotePreset("gembaPnov", "Confirmed and completed")'>Confirmed complete</button>
+<button type="button" class="chip good" onclick='addNotePreset("gembaPnov", "No elevated risk reported at this time")'>No elevated risk</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">👀 Monitor</div><div class="chipbar">
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaPnov", "Currently being monitored by dispatch")'>Being monitored</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaPnov", "Pending driver confirmation")'>Pending confirmation</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaPnov", "Follow-up in progress")'>Follow-up in progress</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaPnov", "Drivers are being contacted for confirmation")'>Drivers being contacted</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaPnov", "Awaiting pictures for confirmation")'>Awaiting pictures</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🧠 Actions</div><div class="chipbar">
+<button type="button" class="chip action" onclick='addNotePreset("gembaPnov", "Driver has been contacted")'>Driver contacted</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaPnov", "Support has been assigned where needed")'>Support assigned</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaPnov", "Pictures have been submitted for confirmation")'>Pictures submitted</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaPnov", "Volume has been confirmed and collected")'>Volume confirmed</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaPnov", "Issue has been escalated for visibility")'>Escalated</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🔧 Gemba technical</div><div class="chipbar">
+<button type="button" class="chip technical" onclick='addNotePreset("gembaPnov", "Pickup Fail status was reviewed and impacted drivers were checked")'>PuF reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaPnov", "PNOV status was reviewed and impacted drivers were checked")'>PNOV reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaPnov", "CRET / Whole Foods pickup status was reviewed")'>CRET reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaPnov", "On-road risk and drivers behind were reviewed")'>Road risk reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaPnov", "Plan of action was documented and will be monitored")'>Plan documented</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🟣 Combo</div><div class="chipbar">
+<button type="button" class="chip combo" onclick='addNotePreset("gembaPnov", "No issues reported at this time. Dispatch will continue monitoring and follow up as needed.")'>Clear combo</button>
+<button type="button" class="chip combo" onclick='addNotePreset("gembaPnov", "Whole Foods pickup status reviewed. Volume confirmation and pictures are being monitored.")'>WF combo</button>
+<button type="button" class="chip combo" onclick='addNotePreset("gembaPnov", "On-road risk reviewed. Drivers behind are being monitored and support will be assigned if needed.")'>Risk combo</button>
+</div></div>
+<!-- END_AUTO_NOTES_gembaPnov -->
+                    <div class="chipbar">
+                      <button type="button" class="chip" onclick="addNotePreset('gembaPnov','No elevated PNOV issues reported at this time')">No PNOV issues</button>
+                      <button type="button" class="chip" onclick="addNotePreset('gembaPnov','Drivers with elevated PNOV have been contacted')">PNOV contacted</button>
+                      <button type="button" class="chip" onclick="addNotePreset('gembaPnov','PNOV is being monitored and followed up with drivers')">PNOV monitored</button>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="gembaCret">CRET / Whole Foods status</label>
+                    <textarea id="gembaCret" placeholder=""></textarea>
+<!-- AUTO_NOTES_gembaCret -->
+<div class="preset-section"><div class="preset-title">✅ Clear status</div><div class="chipbar">
+<button type="button" class="chip good" onclick='addNotePreset("gembaCret", "No issues reported at this time")'>No issues</button>
+<button type="button" class="chip good" onclick='addNotePreset("gembaCret", "Status is clear and under control")'>Under control</button>
+<button type="button" class="chip good" onclick='addNotePreset("gembaCret", "Confirmed and completed")'>Confirmed complete</button>
+<button type="button" class="chip good" onclick='addNotePreset("gembaCret", "No elevated risk reported at this time")'>No elevated risk</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">👀 Monitor</div><div class="chipbar">
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaCret", "Currently being monitored by dispatch")'>Being monitored</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaCret", "Pending driver confirmation")'>Pending confirmation</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaCret", "Follow-up in progress")'>Follow-up in progress</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaCret", "Drivers are being contacted for confirmation")'>Drivers being contacted</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaCret", "Awaiting pictures for confirmation")'>Awaiting pictures</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🧠 Actions</div><div class="chipbar">
+<button type="button" class="chip action" onclick='addNotePreset("gembaCret", "Driver has been contacted")'>Driver contacted</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaCret", "Support has been assigned where needed")'>Support assigned</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaCret", "Pictures have been submitted for confirmation")'>Pictures submitted</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaCret", "Volume has been confirmed and collected")'>Volume confirmed</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaCret", "Issue has been escalated for visibility")'>Escalated</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🔧 Gemba technical</div><div class="chipbar">
+<button type="button" class="chip technical" onclick='addNotePreset("gembaCret", "Pickup Fail status was reviewed and impacted drivers were checked")'>PuF reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaCret", "PNOV status was reviewed and impacted drivers were checked")'>PNOV reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaCret", "CRET / Whole Foods pickup status was reviewed")'>CRET reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaCret", "On-road risk and drivers behind were reviewed")'>Road risk reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaCret", "Plan of action was documented and will be monitored")'>Plan documented</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🟣 Combo</div><div class="chipbar">
+<button type="button" class="chip combo" onclick='addNotePreset("gembaCret", "No issues reported at this time. Dispatch will continue monitoring and follow up as needed.")'>Clear combo</button>
+<button type="button" class="chip combo" onclick='addNotePreset("gembaCret", "Whole Foods pickup status reviewed. Volume confirmation and pictures are being monitored.")'>WF combo</button>
+<button type="button" class="chip combo" onclick='addNotePreset("gembaCret", "On-road risk reviewed. Drivers behind are being monitored and support will be assigned if needed.")'>Risk combo</button>
+</div></div>
+<!-- END_AUTO_NOTES_gembaCret -->
+                    <div class="chipbar">
+                      <button type="button" class="chip" onclick="addNotePreset('gembaCret','Drivers have made it to the Whole Foods stops')">WF stops reached</button>
+                      <button type="button" class="chip" onclick="addNotePreset('gembaCret','All volume has been collected and pictures were submitted')">Volume collected</button>
+                      <button type="button" class="chip" onclick="addNotePreset('gembaCret','Waiting for confirmation that all volume was collected')">Waiting confirmation</button>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="gembaRoadRisk">On-road risk / behind drivers</label>
+                    <textarea id="gembaRoadRisk" placeholder=""></textarea>
+<!-- AUTO_NOTES_gembaRoadRisk -->
+<div class="preset-section"><div class="preset-title">✅ Clear status</div><div class="chipbar">
+<button type="button" class="chip good" onclick='addNotePreset("gembaRoadRisk", "No issues reported at this time")'>No issues</button>
+<button type="button" class="chip good" onclick='addNotePreset("gembaRoadRisk", "Status is clear and under control")'>Under control</button>
+<button type="button" class="chip good" onclick='addNotePreset("gembaRoadRisk", "Confirmed and completed")'>Confirmed complete</button>
+<button type="button" class="chip good" onclick='addNotePreset("gembaRoadRisk", "No elevated risk reported at this time")'>No elevated risk</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">👀 Monitor</div><div class="chipbar">
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaRoadRisk", "Currently being monitored by dispatch")'>Being monitored</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaRoadRisk", "Pending driver confirmation")'>Pending confirmation</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaRoadRisk", "Follow-up in progress")'>Follow-up in progress</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaRoadRisk", "Drivers are being contacted for confirmation")'>Drivers being contacted</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaRoadRisk", "Awaiting pictures for confirmation")'>Awaiting pictures</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🧠 Actions</div><div class="chipbar">
+<button type="button" class="chip action" onclick='addNotePreset("gembaRoadRisk", "Driver has been contacted")'>Driver contacted</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaRoadRisk", "Support has been assigned where needed")'>Support assigned</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaRoadRisk", "Pictures have been submitted for confirmation")'>Pictures submitted</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaRoadRisk", "Volume has been confirmed and collected")'>Volume confirmed</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaRoadRisk", "Issue has been escalated for visibility")'>Escalated</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🔧 Gemba technical</div><div class="chipbar">
+<button type="button" class="chip technical" onclick='addNotePreset("gembaRoadRisk", "Pickup Fail status was reviewed and impacted drivers were checked")'>PuF reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaRoadRisk", "PNOV status was reviewed and impacted drivers were checked")'>PNOV reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaRoadRisk", "CRET / Whole Foods pickup status was reviewed")'>CRET reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaRoadRisk", "On-road risk and drivers behind were reviewed")'>Road risk reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaRoadRisk", "Plan of action was documented and will be monitored")'>Plan documented</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🟣 Combo</div><div class="chipbar">
+<button type="button" class="chip combo" onclick='addNotePreset("gembaRoadRisk", "No issues reported at this time. Dispatch will continue monitoring and follow up as needed.")'>Clear combo</button>
+<button type="button" class="chip combo" onclick='addNotePreset("gembaRoadRisk", "Whole Foods pickup status reviewed. Volume confirmation and pictures are being monitored.")'>WF combo</button>
+<button type="button" class="chip combo" onclick='addNotePreset("gembaRoadRisk", "On-road risk reviewed. Drivers behind are being monitored and support will be assigned if needed.")'>Risk combo</button>
+</div></div>
+<!-- END_AUTO_NOTES_gembaRoadRisk -->
+                    <div class="chipbar">
+                      <button type="button" class="chip" onclick="addNotePreset('gembaRoadRisk','No major on-road risk at this time')">No road risk</button>
+                      <button type="button" class="chip" onclick="addNotePreset('gembaRoadRisk','Drivers behind are being monitored closely')">Behind monitored</button>
+                      <button type="button" class="chip" onclick="addNotePreset('gembaRoadRisk','Rescue plan is in progress for the routes behind')">Rescue in progress</button>
+                    </div>
+                  </div>
+                  <div class="span-full notes-inline">
+                    <label for="gembaActionPlan">Action plan / extra notes</label>
+                    <textarea id="gembaActionPlan" placeholder=""></textarea>
+<div class="chipbar"><button type="button" class="chip combo" onclick="applySmartGembaNotes()">✨ Smart Gemba</button></div>
+<!-- AUTO_NOTES_gembaActionPlan -->
+<div class="preset-section"><div class="preset-title">✅ Clear status</div><div class="chipbar">
+<button type="button" class="chip good" onclick='addNotePreset("gembaActionPlan", "No issues reported at this time")'>No issues</button>
+<button type="button" class="chip good" onclick='addNotePreset("gembaActionPlan", "Status is clear and under control")'>Under control</button>
+<button type="button" class="chip good" onclick='addNotePreset("gembaActionPlan", "Confirmed and completed")'>Confirmed complete</button>
+<button type="button" class="chip good" onclick='addNotePreset("gembaActionPlan", "No elevated risk reported at this time")'>No elevated risk</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">👀 Monitor</div><div class="chipbar">
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaActionPlan", "Currently being monitored by dispatch")'>Being monitored</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaActionPlan", "Pending driver confirmation")'>Pending confirmation</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaActionPlan", "Follow-up in progress")'>Follow-up in progress</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaActionPlan", "Drivers are being contacted for confirmation")'>Drivers being contacted</button>
+<button type="button" class="chip monitor" onclick='addNotePreset("gembaActionPlan", "Awaiting pictures for confirmation")'>Awaiting pictures</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🧠 Actions</div><div class="chipbar">
+<button type="button" class="chip action" onclick='addNotePreset("gembaActionPlan", "Driver has been contacted")'>Driver contacted</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaActionPlan", "Support has been assigned where needed")'>Support assigned</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaActionPlan", "Pictures have been submitted for confirmation")'>Pictures submitted</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaActionPlan", "Volume has been confirmed and collected")'>Volume confirmed</button>
+<button type="button" class="chip action" onclick='addNotePreset("gembaActionPlan", "Issue has been escalated for visibility")'>Escalated</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🔧 Gemba technical</div><div class="chipbar">
+<button type="button" class="chip technical" onclick='addNotePreset("gembaActionPlan", "Pickup Fail status was reviewed and impacted drivers were checked")'>PuF reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaActionPlan", "PNOV status was reviewed and impacted drivers were checked")'>PNOV reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaActionPlan", "CRET / Whole Foods pickup status was reviewed")'>CRET reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaActionPlan", "On-road risk and drivers behind were reviewed")'>Road risk reviewed</button>
+<button type="button" class="chip technical" onclick='addNotePreset("gembaActionPlan", "Plan of action was documented and will be monitored")'>Plan documented</button>
+</div></div>
+<div class="preset-section"><div class="preset-title">🟣 Combo</div><div class="chipbar">
+<button type="button" class="chip combo" onclick='addNotePreset("gembaActionPlan", "No issues reported at this time. Dispatch will continue monitoring and follow up as needed.")'>Clear combo</button>
+<button type="button" class="chip combo" onclick='addNotePreset("gembaActionPlan", "Whole Foods pickup status reviewed. Volume confirmation and pictures are being monitored.")'>WF combo</button>
+<button type="button" class="chip combo" onclick='addNotePreset("gembaActionPlan", "On-road risk reviewed. Drivers behind are being monitored and support will be assigned if needed.")'>Risk combo</button>
+</div></div>
+<!-- END_AUTO_NOTES_gembaActionPlan -->
+<!-- ADVANCED_NOTES_gembaActionPlan -->
+<div class="preset-section advanced-notes"><div class="preset-title">🟣 Advanced Operation Notes</div>
+<div class="preset-title" style="margin-top:10px;">🟣 Advanced Performance / Stability</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Operational performance remains stable across all active routes.")'>Operation stable across routes</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "No significant operational risks have been identified at this time.")'>No major risks identified</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Execution metrics are aligned with expected operational standards.")'>Execution within expectations</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Performance remains consistent with current operational expectations.")'>Performance remains consistent</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">👀 Advanced Monitoring / Control</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Route-level performance is being actively monitored by dispatch.")'>Monitoring route performance</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Delivery exceptions are being tracked and reviewed in real time.")'>Monitoring delivery exceptions</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Driver compliance and execution behavior are under active monitoring.")'>Monitoring driver compliance</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Dispatch is monitoring real-time execution data to identify potential deviations.")'>Real-time monitoring</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">🚨 Advanced Issues / Impact</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Delivery exceptions are showing an increasing trend and are under review.")'>Delivery exceptions increasing</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Current package volume is impacting overall route execution efficiency.")'>Volume impacting performance</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Localized delays have been identified in specific delivery zones.")'>Localized delays</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Performance deviation has been identified and is being actively evaluated.")'>Performance deviation</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">🔧 Advanced Dispatch Actions</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Dispatch is actively engaged in monitoring and supporting route execution.")'>Dispatch actively engaged</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Operational support is being deployed to maintain performance levels.")'>Support being deployed</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Operational adjustments are currently in progress to stabilize execution.")'>Adjustments in progress</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Escalation is in progress to maintain operational visibility and support.")'>Escalation in progress</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">🧠 Advanced Analysis / Intelligence</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Operational performance is under continuous review based on real-time data.")'>Performance under review</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Dispatch decisions are being guided by real-time performance data.")'>Data-driven monitoring</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "A performance trend has been identified and is being evaluated.")'>Trend identified</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Exception trends are being reviewed to identify recurring operational barriers.")'>Exception trend review</button>
+</div>
+<div class="preset-title" style="margin-top:10px;">🔥 Advanced Combo</div>
+<div class="chipbar">
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Operation remains stable with no significant risks. Dispatch will continue monitoring execution to ensure consistency.")'>Stable operation</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Minor performance deviations have been identified. Dispatch is monitoring closely and providing support where needed.")'>Moderate risk</button>
+<button type="button" class="chip advanced" onclick='addNotePreset("gembaActionPlan", "Operational challenges have been identified. Dispatch is actively managing risk, assigning support, and monitoring performance closely.")'>High attention</button>
+</div>
+</div>
+<!-- END_ADVANCED_NOTES_gembaActionPlan -->
+
+                    <div class="preset-section">
+                      <div class="preset-title">✅ Clear status</div>
+                      <div class="chipbar">
+                        <button type="button" class="chip good" onclick="addNotePreset('gembaActionPlan','No issues reported at this time')">No issues</button>
+                        <button type="button" class="chip good" onclick="addNotePreset('gembaActionPlan','Status is clear and under control')">Under control</button>
+                        <button type="button" class="chip good" onclick="addNotePreset('gembaActionPlan','Confirmed and completed')">Confirmed complete</button>
+                      </div>
+                    </div>
+                    <div class="preset-section">
+                      <div class="preset-title">👀 Monitor</div>
+                      <div class="chipbar">
+                        <button type="button" class="chip monitor" onclick="addNotePreset('gembaActionPlan','Currently being monitored by dispatch')">Being monitored</button>
+                        <button type="button" class="chip monitor" onclick="addNotePreset('gembaActionPlan','Pending driver confirmation')">Pending confirmation</button>
+                        <button type="button" class="chip monitor" onclick="addNotePreset('gembaActionPlan','Follow-up in progress')">Follow-up in progress</button>
+                      </div>
+                    </div>
+                    <div class="preset-section">
+                      <div class="preset-title">🧠 Actions</div>
+                      <div class="chipbar">
+                        <button type="button" class="chip action" onclick="addNotePreset('gembaActionPlan','Driver has been contacted')">Driver contacted</button>
+                        <button type="button" class="chip action" onclick="addNotePreset('gembaActionPlan','Support has been assigned where needed')">Support assigned</button>
+                        <button type="button" class="chip action" onclick="addNotePreset('gembaActionPlan','Pictures have been submitted for confirmation')">Pictures submitted</button>
+                        <button type="button" class="chip combo" onclick="addNotePreset('gembaActionPlan','No issues reported at this time. Dispatch will continue monitoring and follow up as needed.')">Clear combo</button>
+                      </div>
+                    </div>
+                    <div class="chipbar">
+                      <button type="button" class="chip" onclick="addNotePreset('gembaActionPlan','No additional issues reported')">No additional issues</button>
+                      <button type="button" class="chip" onclick="addNotePreset('gembaActionPlan','Dispatch will continue monitoring and follow up as needed')">Continue monitoring</button>
+                      <button type="button" class="chip" onclick="addNotePreset('gembaActionPlan','Support has been assigned where needed')">Support assigned</button>
+                      <button type="button" class="chip" onclick="addNotePreset('gembaActionPlan','Pictures have been submitted for confirmation')">Pictures submitted</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="actions">
+            <button class="primary" onclick="generateReport()">Generate report</button>
+            <button class="success" onclick="autoGenerateFullReport()">🤖 Auto Generate Full Report</button>
+            <button class="secondary" onclick="copyReport()">Copy for Telegram</button>
+            <button class="success" onclick="saveSnapshot()">Save report</button>
+            <button class="ghost" onclick="downloadTxt()">Download .txt</button>
+            <button class="warn" onclick="clearCurrent()">Clear current section</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Preview</h2>
+          <div class="kpis">
+            <div class="kpi"><div class="num" id="k1">-</div><div class="lab" id="k1l">Main</div></div>
+            <div class="kpi"><div class="num" id="k2">-</div><div class="lab" id="k2l">Main</div></div>
+            <div class="kpi"><div class="num" id="k3">-</div><div class="lab" id="k3l">Main</div></div>
+            <div class="kpi"><div class="num" id="k4">-</div><div class="lab" id="k4l">Main</div></div>
+          </div>
+          <textarea id="output" class="output" readonly></textarea>
+          <div class="small" style="margin-top:8px;">Use Settings to edit labels, titles, and emojis.</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:24px;">
+        <h2>Saved History</h2>
+        <div class="sub">Your previously saved reports will appear here.</div>
+        <div id="history"></div>
+      </div>
+    </div>
+
+    <div id="settingsView" class="hidden">
+      <div class="card">
+        <h2>Settings</h2>
+        <div class="sub">Edit titles, labels, and emojis here without cluttering the main workspace.</div>
+
+        <div class="switcher">
+          <button id="settingsMorningBtn" class="active" onclick="showSettingsPanel('morning')">Morning</button>
+          <button id="settingsProgressBtn" onclick="showSettingsPanel('progress')">Progress</button>
+          <button id="settingsClosingBtn" onclick="showSettingsPanel('closing')">Closing</button>
+          <button id="settingsGembaBtn" onclick="showSettingsPanel('gemba')">Gemba</button>
+        </div>
+
+        <div id="settingsMorning">
+          <div class="settings-layout">
+            <div class="field-group">
+              <span class="pill">Header</span>
+              <div class="form-grid two">
+                <div><label for="morningTitle">Title</label><input id="morningTitle_settings_proxy" data-sync="morningTitle" placeholder=""></div>
+                <div><label for="morningTitleEmoji">Emoji</label><input id="morningTitleEmoji_settings_proxy" data-sync="morningTitleEmoji" placeholder=""></div>
+                <div><label for="morningNotesTitle">Notes title</label><input id="morningNotesTitle_settings_proxy" data-sync="morningNotesTitle" placeholder=""></div>
+                <div><label for="morningNotesEmoji">Notes emoji</label><input id="morningNotesEmoji_settings_proxy" data-sync="morningNotesEmoji" placeholder=""></div>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <span class="pill">Main labels</span>
+              <div class="form-grid four">
+                <div><label>Phones label</label><input data-sync="phonesLabel"></div>
+                <div><label>Phones emoji</label><input data-sync="phonesEmoji"></div>
+                <div><label>Chargers label</label><input data-sync="chargersLabel"></div>
+                <div><label>Chargers emoji</label><input data-sync="chargersEmoji"></div>
+
+                <div><label>Gas cards label</label><input data-sync="gasCardsLabel"></div>
+                <div><label>Gas cards emoji</label><input data-sync="gasCardsEmoji"></div>
+                <div><label>Routes label</label><input data-sync="routesMorningLabel"></div>
+                <div><label>Routes emoji</label><input data-sync="routesMorningEmoji"></div>
+
+                <div><label>Total packages label</label><input data-sync="totalPackagesMorningLabel"></div>
+                <div><label>Total packages emoji</label><input data-sync="totalPackagesMorningEmoji"></div>
+                <div><label>Remaining label</label><input data-sync="remainingMorningLabel"></div>
+                <div><label>Remaining emoji</label><input data-sync="remainingMorningEmoji"></div>
+
+                <div><label>Stop progress label</label><input data-sync="stopMorningLabel"></div>
+                <div><label>Stop progress emoji</label><input data-sync="stopMorningEmoji"></div>
+                <div><label>Package progress label</label><input data-sync="packageMorningLabel"></div>
+                <div><label>Package progress emoji</label><input data-sync="packageMorningEmoji"></div>
+
+                <div><label>Attempt success label</label><input data-sync="attemptMorningLabel"></div>
+                <div><label>Attempt success emoji</label><input data-sync="attemptMorningEmoji"></div>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <span class="pill">Section titles</span>
+              <div class="form-grid four">
+                <div><label>Daily Log title</label><input data-sync="dailyLogTitle"></div>
+                <div><label>Daily Log emoji</label><input data-sync="dailyLogEmoji"></div>
+                <div><label>GEOTAB title</label><input data-sync="geotabTitle"></div>
+                <div><label>GEOTAB emoji</label><input data-sync="geotabEmoji"></div>
+
+                <div><label>Call outs title</label><input data-sync="callOutsTitle"></div>
+                <div><label>Call outs emoji</label><input data-sync="callOutsEmoji"></div>
+                <div><label>Late title</label><input data-sync="lateTitle"></div>
+                <div><label>Late emoji</label><input data-sync="lateEmoji"></div>
+
+                <div><label>Netradyne title</label><input data-sync="netradyneTitle"></div>
+                <div><label>Netradyne emoji</label><input data-sync="netradyneEmoji"></div>
+                <div><label>Load out title</label><input data-sync="loadoutTitle"></div>
+                <div><label>Load out emoji</label><input data-sync="loadoutEmoji"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="settingsProgress" class="hidden">
+          <div class="settings-layout">
+            <div class="field-group">
+              <span class="pill">Main</span>
+              <div class="form-grid four">
+                <div><label>Title</label><input data-sync="progressTitle"></div>
+                <div><label>Title emoji</label><input data-sync="progressTitleEmoji"></div>
+                <div><label>Routes label</label><input data-sync="routesLabel"></div>
+                <div><label>Routes emoji</label><input data-sync="routesEmoji"></div>
+
+                <div><label>Remaining label</label><input data-sync="remainingLabel"></div>
+                <div><label>Remaining emoji</label><input data-sync="remainingEmoji"></div>
+                <div><label>Stop progress label</label><input data-sync="stopProgressLabel"></div>
+                <div><label>Stop progress emoji</label><input data-sync="stopProgressEmoji"></div>
+
+                <div><label>Package progress label</label><input data-sync="packageProgressLabel"></div>
+                <div><label>Package progress emoji</label><input data-sync="packageProgressEmoji"></div>
+                <div><label>Attempt success label</label><input data-sync="attemptSuccessLabel"></div>
+                <div><label>Attempt success emoji</label><input data-sync="attemptSuccessEmoji"></div>
+
+                <div><label>Locations progress label</label><input data-sync="locationsProgressLabel"></div>
+                <div><label>Locations progress emoji</label><input data-sync="locationsProgressEmoji"></div>
+                <div><label>Package status title</label><input data-sync="packageStatusTitle"></div>
+                <div><label>Package status emoji</label><input data-sync="packageStatusEmoji"></div>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <span class="pill">Details sections</span>
+              <div class="form-grid four">
+                <div><label>Reattemptable details title</label><input data-sync="reattemptableDetailsTitle"></div>
+                <div><label>Reattemptable details emoji</label><input data-sync="reattemptableDetailsEmoji"></div>
+                <div><label>Missing details title</label><input data-sync="missingDetailsTitle"></div>
+                <div><label>Missing details emoji</label><input data-sync="missingDetailsEmoji"></div>
+
+                <div><label>Infractions details title</label><input data-sync="infractionsDetailsTitle"></div>
+                <div><label>Infractions details emoji</label><input data-sync="infractionsDetailsEmoji"></div>
+                <div><label>Risk level title</label><input data-sync="riskLevelTitle"></div>
+                <div><label>Risk level emoji</label><input data-sync="riskLevelEmoji"></div>
+
+                <div><label>Rescue plan title</label><input data-sync="rescuePlanTitle"></div>
+                <div><label>Rescue plan emoji</label><input data-sync="rescuePlanEmoji"></div>
+                <div><label>Behind title</label><input data-sync="behindNamesTitle"></div>
+                <div><label>Behind emoji</label><input data-sync="behindNamesEmoji"></div>
+
+                <div><label>At risk title</label><input data-sync="atRiskNamesTitle"></div>
+                <div><label>At risk emoji</label><input data-sync="atRiskNamesEmoji"></div>
+                <div><label>Other missing notes title</label><input data-sync="missingNamesTitle"></div>
+                <div><label>Other missing notes emoji</label><input data-sync="missingNamesEmoji"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="settingsClosing" class="hidden">
+          <div class="settings-layout">
+            <div class="field-group">
+              <span class="pill">Header</span>
+              <div class="form-grid four">
+                <div><label>Title</label><input data-sync="closingTitle"></div>
+                <div><label>Title emoji</label><input data-sync="closingTitleEmoji"></div>
+                <div><label>Pre/Post title</label><input data-sync="prePostTitle"></div>
+                <div><label>Pre/Post emoji</label><input data-sync="prePostEmoji"></div>
+
+                <div><label>RTS title</label><input data-sync="rtsTitle"></div>
+                <div><label>RTS emoji</label><input data-sync="rtsEmoji"></div>
+                <div><label>Events title</label><input data-sync="eventsTitle"></div>
+                <div><label>Events emoji</label><input data-sync="eventsEmoji"></div>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <span class="pill">Closing sections</span>
+              <div class="form-grid four">
+                <div><label>Cage status title</label><input data-sync="cageStatusTitle"></div>
+                <div><label>Cage status emoji</label><input data-sync="cageStatusEmoji"></div>
+                <div><label>Phones label</label><input data-sync="closingPhonesLabel"></div>
+                <div><label>Phones emoji</label><input data-sync="closingPhonesEmoji"></div>
+
+                <div><label>Chargers label</label><input data-sync="closingChargersLabel"></div>
+                <div><label>Chargers emoji</label><input data-sync="closingChargersEmoji"></div>
+                <div><label>Completed tasks title</label><input data-sync="completedTasksTitle"></div>
+                <div><label>Completed tasks emoji</label><input data-sync="completedTasksEmoji"></div>
+
+                <div><label>Pickups title</label><input data-sync="pickupsClosingTitle"></div>
+                <div><label>Pickups emoji</label><input data-sync="pickupsClosingEmoji"></div>
+                <div><label>Extra note title</label><input data-sync="closingExtraTitle"></div>
+                <div><label>Extra note emoji</label><input data-sync="closingExtraEmoji"></div>
+
+                <div><label>Reset title</label><input data-sync="resetClosingTitle"></div>
+                <div><label>Reset emoji</label><input data-sync="resetClosingEmoji"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div id="settingsGemba" class="hidden">
+          <div class="settings-layout">
+            <div class="field-group">
+              <span class="pill">Gemba defaults</span>
+              <div class="form-grid four">
+                <div><label>Default title</label><input data-sync="gembaTitle"></div>
+                <div><label>Default site</label><input data-sync="gembaSite"></div>
+                <div><label>Default intro</label><input data-sync="gembaIntro"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="actions">
+          <button class="primary" onclick="showView('main')">Back to main</button>
+          <button class="ghost" onclick="resetSettingsDefaults()">Reset default settings</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden config inputs used by the generator -->
+  <div style="display:none">
+    <input id="morningTitle" value="Morning Report"><input id="morningTitleEmoji" value="☀️">
+    <input id="morningNotesTitle" value="Notes"><input id="morningNotesEmoji" value="📝">
+    <input id="phonesLabel" value="Phones"><input id="phonesEmoji" value="📱">
+    <input id="chargersLabel" value="Chargers"><input id="chargersEmoji" value="🔌">
+    <input id="gasCardsLabel" value="Gas cards"><input id="gasCardsEmoji" value="⛽">
+    <input id="routesMorningLabel" value="Routes"><input id="routesMorningEmoji" value="🛣️">
+    <input id="totalPackagesMorningLabel" value="Total packages today"><input id="totalPackagesMorningEmoji" value="📦">
+    <input id="remainingMorningLabel" value="Remaining packages"><input id="remainingMorningEmoji" value="❗">
+    <input id="stopMorningLabel" value="Stop progress"><input id="stopMorningEmoji" value="🛑">
+    <input id="packageMorningLabel" value="Package progress"><input id="packageMorningEmoji" value="📬">
+    <input id="attemptMorningLabel" value="Attempt success"><input id="attemptMorningEmoji" value="✅">
+    <input id="dailyLogTitle" value="Daily Log and LMD Max"><input id="dailyLogEmoji" value="🗂️">
+    <input id="geotabTitle" value="GEOTAB"><input id="geotabEmoji" value="🛰️">
+    <input id="callOutsTitle" value="Call outs"><input id="callOutsEmoji" value="📞">
+    <input id="lateTitle" value="Late"><input id="lateEmoji" value="⏰">
+    <input id="netradyneTitle" value="Netradyne"><input id="netradyneEmoji" value="🎥">
+    <input id="loadoutTitle" value="Load out"><input id="loadoutEmoji" value="🚚">
+
+    <input id="progressTitle" value="Report"><input id="progressTitleEmoji" value="⏰">
+    <input id="routesLabel" value="Routes"><input id="routesEmoji" value="🛣️">
+    <input id="remainingLabel" value="Remaining packages"><input id="remainingEmoji" value="📦">
+    <input id="stopProgressLabel" value="Stop progress"><input id="stopProgressEmoji" value="🛑">
+    <input id="packageProgressLabel" value="Package progress"><input id="packageProgressEmoji" value="📬">
+    <input id="attemptSuccessLabel" value="Attempt success"><input id="attemptSuccessEmoji" value="✅">
+    <input id="locationsProgressLabel" value="Locations progress"><input id="locationsProgressEmoji" value="📍">
+    <input id="packageStatusTitle" value="Package status"><input id="packageStatusEmoji" value="📌">
+    <input id="reattemptableDetailsTitle" value="Reattempts"><input id="reattemptableDetailsEmoji" value="">
+    <input id="missingDetailsTitle" value="Missing"><input id="missingDetailsEmoji" value="">
+    <input id="infractionsDetailsTitle" value="Infractions"><input id="infractionsDetailsEmoji" value="🚨">
+    <input id="riskLevelTitle" value="Risk level"><input id="riskLevelEmoji" value="⚠️">
+    <input id="rescuePlanTitle" value="Rescue plan / sweepers"><input id="rescuePlanEmoji" value="🚚">
+    <input id="behindNamesTitle" value="Behind"><input id="behindNamesEmoji" value="🔴">
+    <input id="atRiskNamesTitle" value="At risk"><input id="atRiskNamesEmoji" value="🟡">
+    <input id="missingNamesTitle" value="Missing details"><input id="missingNamesEmoji" value="❓">
+
+    <input id="closingTitle" value="Closing reports"><input id="closingTitleEmoji" value="🌙">
+    <input id="prePostTitle" value=""><input id="prePostEmoji" value="✅">
+    <input id="rtsTitle" value="RTS"><input id="rtsEmoji" value="">
+    <input id="eventsTitle" value="Events"><input id="eventsEmoji" value="">
+    <input id="cageStatusTitle" value=""><input id="cageStatusEmoji" value="">
+    <input id="closingPhonesLabel" value="📱 Phones"><input id="closingPhonesEmoji" value="📱">
+    <input id="closingChargersLabel" value="🔋 Chargers"><input id="closingChargersEmoji" value="🔋">
+    <input id="completedTasksTitle" value=""><input id="completedTasksEmoji" value="">
+    <input id="pickupsClosingTitle" value=""><input id="pickupsClosingEmoji" value="">
+    <input id="closingExtraTitle" value=""><input id="closingExtraEmoji" value="">
+    <input id="resetClosingTitle" value=""><input id="resetClosingEmoji" value="">
+  </div>
+
+  <script>
+    let currentMode = "morning";
+
+    const dataIds = [
+      "station","reportDate","reportTime","phones","chargers","gasCards","routesMorning","totalPackagesMorning","remainingMorning","stopMorning","packageMorning","attemptMorning",
+      "dailyLog","geotab","callOuts","late","netradyne","loadout","notes",
+      "remaining","routes","stopProgress","packageProgress","attemptSuccess","locationsProgress","reattemptable","missing","undeliverable","returned","pickupFailed","infractions",
+      "ahead","atRiskNum","behindNum","rescuePlan","behindNames","atRiskNames","missingNames","notesProgress",
+      "prePostInspections","rtsSummary","eventsClosing","cageStatus","rtsReturned","rtsGoal","closingPhones","closingChargers","completedTasks","pickupsClosing","closingExtra","resetClosing","notesClosing","gembaTime","gembaSite","gembaTitle","gembaIntro","gembaPickupFail","gembaPnov","gembaCret","gembaRoadRisk","gembaActionPlan","gembaGeneratedReport"
+    ];
+
+    const settingsIds = [
+      "morningTitle","morningTitleEmoji","morningNotesTitle","morningNotesEmoji","phonesLabel","phonesEmoji","chargersLabel","chargersEmoji","gasCardsLabel","gasCardsEmoji","routesMorningLabel","routesMorningEmoji","totalPackagesMorningLabel","totalPackagesMorningEmoji","remainingMorningLabel","remainingMorningEmoji","stopMorningLabel","stopMorningEmoji","packageMorningLabel","packageMorningEmoji","attemptMorningLabel","attemptMorningEmoji","dailyLogTitle","dailyLogEmoji","geotabTitle","geotabEmoji","callOutsTitle","callOutsEmoji","lateTitle","lateEmoji","netradyneTitle","netradyneEmoji","loadoutTitle","loadoutEmoji",
+      "progressTitle","progressTitleEmoji","routesLabel","routesEmoji","remainingLabel","remainingEmoji","stopProgressLabel","stopProgressEmoji","packageProgressLabel","packageProgressEmoji","attemptSuccessLabel","attemptSuccessEmoji","locationsProgressLabel","locationsProgressEmoji","packageStatusTitle","packageStatusEmoji","reattemptableDetailsTitle","reattemptableDetailsEmoji","missingDetailsTitle","missingDetailsEmoji","infractionsDetailsTitle","infractionsDetailsEmoji","riskLevelTitle","riskLevelEmoji","rescuePlanTitle","rescuePlanEmoji","behindNamesTitle","behindNamesEmoji","atRiskNamesTitle","atRiskNamesEmoji","missingNamesTitle","missingNamesEmoji",
+      "closingTitle","closingTitleEmoji","prePostTitle","prePostEmoji","rtsTitle","rtsEmoji","eventsTitle","eventsEmoji","cageStatusTitle","cageStatusEmoji","closingPhonesLabel","closingPhonesEmoji","closingChargersLabel","closingChargersEmoji","completedTasksTitle","completedTasksEmoji","pickupsClosingTitle","pickupsClosingEmoji","closingExtraTitle","closingExtraEmoji","resetClosingTitle","resetClosingEmoji","gembaTitle","gembaSite","gembaIntro"
+    ];
+
+    function val(id){ const el=document.getElementById(id); return el?el.value.trim():""; }
+    function fmtDate(value){
+  if(!value) return "";
+  const parts = value.split("-");
+  if(parts.length === 3){
+    const [y,m,d] = parts;
+    return `${m}/${d}/${y}`;
+  }
+  return value;
+}
+    function plainLines(text){ if(!text.trim()) return ""; return text.split(/\n+/).map(x=>x.trim()).filter(Boolean).join("\n"); }
+    function listify(text, bullet="•"){ if(!text.trim()) return ""; return text.split(/\n+/).map(x=>x.trim()).filter(Boolean).map(x=>`${bullet} ${x}`).join("\n"); }
+    function prefix(emoji,label){ return `${emoji?emoji+" ":""}${label||""}`.trim(); }
+    function fieldLine(emoji,label,value,suffix=""){ if(value==="") return ""; const pre=prefix(emoji,label); return pre?`${pre}: ${value}${suffix}`:`${value}${suffix}`; }
+    function addLine(arr,text){ if(text&&text.trim()) arr.push(text); }
+    function addSection(arr,title,body){ if(body&&body.trim()){ if(title&&title.trim()) arr.push(title); arr.push(body); arr.push(""); } }
+    function cleanup(text){ return text.replace(/\n{3,}/g,"\n\n").replace(/[ \t]+\n/g,"\n").trim(); }
+
+    function showView(view){
+      document.getElementById("mainView").classList.toggle("hidden", view!=="main");
+      document.getElementById("settingsView").classList.toggle("hidden", view!=="settings");
+      document.getElementById("navMain").className = view==="main" ? "active" : "ghostbtn";
+      document.getElementById("navSettings").className = view==="settings" ? "active" : "ghostbtn";
+    }
+
+    function showSettingsPanel(panel){
+      document.getElementById("settingsMorning").classList.toggle("hidden", panel!=="morning");
+      document.getElementById("settingsProgress").classList.toggle("hidden", panel!=="progress");
+      document.getElementById("settingsClosing").classList.toggle("hidden", panel!=="closing");
+      document.getElementById("settingsGemba").classList.toggle("hidden", panel!=="gemba");
+      document.getElementById("settingsMorningBtn").classList.toggle("active", panel==="morning");
+      document.getElementById("settingsProgressBtn").classList.toggle("active", panel==="progress");
+      document.getElementById("settingsClosingBtn").classList.toggle("active", panel==="closing");
+      document.getElementById("settingsGembaBtn").classList.toggle("active", panel==="gemba");
+    }
+
+    function setMode(mode){
+      currentMode=mode;
+      document.getElementById("morningFields").classList.toggle("hidden",mode!=="morning");
+      document.getElementById("progressFields").classList.toggle("hidden",mode!=="progress");
+      document.getElementById("closingFields").classList.toggle("hidden",mode!=="closing");
+      document.getElementById("gembaFields").classList.toggle("hidden",mode!=="gemba");
+      document.getElementById("btnMorning").classList.toggle("active",mode==="morning");
+      document.getElementById("btnProgress").classList.toggle("active",mode==="progress");
+      document.getElementById("btnClosing").classList.toggle("active",mode==="closing");
+      document.getElementById("btnGemba").classList.toggle("active",mode==="gemba");
+      updateKpis(); persistForm(); generateReport();
+    }
+
+    function initSettingsSync(){
+      document.querySelectorAll("[data-sync]").forEach(proxy=>{
+        const targetId = proxy.getAttribute("data-sync");
+        const target = document.getElementById(targetId);
+        if(target){
+          proxy.value = target.value;
+          proxy.addEventListener("input", ()=>{
+            target.value = proxy.value;
+            persistForm();
+            updateKpis();
+            generateReport();
+          });
+        }
+      });
+    }
+
+    function refreshSettingsProxyValues(){
+      document.querySelectorAll("[data-sync]").forEach(proxy=>{
+        const targetId = proxy.getAttribute("data-sync");
+        const target = document.getElementById(targetId);
+        if(target) proxy.value = target.value;
+      });
+    }
+
+    function updateKpis(){
+      if(currentMode==="morning"){
+        document.getElementById("k1").textContent=val("totalPackagesMorning")||"-";
+        document.getElementById("k1l").textContent=val("totalPackagesMorningLabel")||"Total packages";
+        document.getElementById("k2").textContent=val("remainingMorning")||"-";
+        document.getElementById("k2l").textContent=val("remainingMorningLabel")||"Remaining";
+        document.getElementById("k3").textContent=val("stopMorning")?val("stopMorning")+"%":"-";
+        document.getElementById("k3l").textContent=val("stopMorningLabel")||"Stop progress";
+        document.getElementById("k4").textContent=val("attemptMorning")?val("attemptMorning")+"%":"-";
+        document.getElementById("k4l").textContent=val("attemptMorningLabel")||"Attempt success";
+      } else if(currentMode==="progress"){
+        document.getElementById("k1").textContent=val("remaining")||"-";
+        document.getElementById("k1l").textContent=val("remainingLabel")||"Remaining";
+        document.getElementById("k2").textContent=val("reattemptable")||"-";
+        document.getElementById("k2l").textContent="Reattemptable";
+        document.getElementById("k3").textContent=val("missing")||"-";
+        document.getElementById("k3l").textContent="Missing";
+        document.getElementById("k4").textContent=val("infractions")||"-";
+        document.getElementById("k4l").textContent="Infractions";
+      } else if(currentMode==="closing") {
+        document.getElementById("k1").textContent=val("rtsReturned")||"-";
+        document.getElementById("k1l").textContent="RTS returned";
+        document.getElementById("k2").textContent=val("rtsGoal")||"-";
+        document.getElementById("k2l").textContent="Goal";
+        document.getElementById("k3").textContent=val("closingPhones")||"-";
+        document.getElementById("k3l").textContent=val("closingPhonesLabel")||"Phones";
+        document.getElementById("k4").textContent=val("closingChargers")||"-";
+        document.getElementById("k4l").textContent=val("closingChargersLabel")||"Chargers";
+      } else {
+        document.getElementById("k1").textContent=val("gembaTime")||"-";
+        document.getElementById("k1l").textContent="Gemba time";
+        document.getElementById("k2").textContent=val("gembaSite")||"-";
+        document.getElementById("k2l").textContent="Site";
+        document.getElementById("k3").textContent=val("gembaPickupFail") ? "✓" : "-";
+        document.getElementById("k3l").textContent="PuF";
+        document.getElementById("k4").textContent=val("gembaRoadRisk") ? "✓" : "-";
+        document.getElementById("k4l").textContent="Road risk";
+      }
+    }
+
+    function addRepeatRow(containerId, type, data={}){
+      const container=document.getElementById(containerId);
+      const idx=container.children.length;
+      const row=document.createElement("div");
+      row.className="repeat-row";
+
+      let middleLabel = "Detail";
+      let endLabel = "TBA number";
+      if(type === "missing"){ middleLabel = "TBA number"; endLabel = "Extra detail"; }
+      if(type === "infraction"){ middleLabel = "Reason / event"; endLabel = "TBA number"; }
+
+      const middleField = type === "missing" ? "tba" : "detail";
+      const endField = type === "missing" ? "detail" : "tba";
+
+      row.innerHTML=`
+        <div class="repeat-head">
+          <div class="repeat-title">${type.charAt(0).toUpperCase()+type.slice(1)} item ${idx+1}</div>
+          <button class="warn mini" type="button">Remove</button>
+        </div>
+        <div class="form-grid three">
+          <div><label>Name</label><input data-type="${type}" data-field="name" value="${data.name||''}" placeholder=""></div>
+          <div><label>${middleLabel}</label><input data-type="${type}" data-field="${middleField}" value="${data[middleField]||''}" placeholder=""></div>
+          <div><label>${endLabel}</label><input data-type="${type}" data-field="${endField}" value="${data[endField]||''}" placeholder=""></div>
+        </div>
+      `;
+      row.querySelector("button").onclick=()=>{ row.remove(); persistForm(); generateReport(); };
+      row.querySelectorAll("input").forEach(inp=>inp.addEventListener("input", ()=>{persistForm();generateReport();}));
+      container.appendChild(row);
+    }
+
+    function collectRepeatRows(type){
+      const rows=[...document.querySelectorAll(`input[data-type="${type}"]`)];
+      const items=[]; const grouped={};
+      rows.forEach(inp=>{
+        const parent=inp.closest(".repeat-row");
+        const key=[...parent.parentNode.children].indexOf(parent);
+        grouped[key]=grouped[key]||{};
+        grouped[key][inp.dataset.field]=inp.value.trim();
+      });
+      Object.values(grouped).forEach(item=>{ if((item.name||"") || (item.detail||"") || (item.tba||"")) items.push(item); });
+      return items;
+    }
+
+    function formatDetailedItems(type){
+      const items=collectRepeatRows(type);
+      if(!items.length) return "";
+      return items.map(item=>{
+        let line = item.name || "";
+        if(type === "missing"){
+          if(item.tba) line += `${line ? " -> " : ""}TBA${item.tba}`;
+          if(item.detail) line += `${line ? " | " : ""}${item.detail}`;
+        } else {
+          if(item.detail) line += `${line ? " -> " : ""}${item.detail}`;
+          if(item.tba) line += `${line ? " | " : ""}TBA${item.tba}`;
+        }
+        return line;
+      }).join("\n");
+    }
+
+    function generateMorning(){
+      const out=[];
+      out.push(`${val("morningTitleEmoji")?val("morningTitleEmoji")+" ":""}${val("morningTitle")||"Morning Report"}${val("reportDate")?" - "+fmtDate(val("reportDate")):""}`);
+      if(val("station")) out.push(val("station"));
+      out.push("");
+      addLine(out, fieldLine(val("phonesEmoji"),val("phonesLabel"),val("phones")));
+      addLine(out, fieldLine(val("chargersEmoji"),val("chargersLabel"),val("chargers")));
+      addLine(out, fieldLine(val("gasCardsEmoji"),val("gasCardsLabel"),val("gasCards")));
+      addLine(out, fieldLine(val("routesMorningEmoji"),val("routesMorningLabel"),val("routesMorning")));
+      if(out[out.length-1] !== "") out.push("");
+      addLine(out, fieldLine(val("totalPackagesMorningEmoji"),val("totalPackagesMorningLabel"),val("totalPackagesMorning")));
+      addLine(out, fieldLine(val("remainingMorningEmoji"),val("remainingMorningLabel"),val("remainingMorning")));
+      addLine(out, fieldLine(val("stopMorningEmoji"),val("stopMorningLabel"),val("stopMorning"),"%"));
+      addLine(out, fieldLine(val("packageMorningEmoji"),val("packageMorningLabel"),val("packageMorning"),"%"));
+      addLine(out, fieldLine(val("attemptMorningEmoji"),val("attemptMorningLabel"),val("attemptMorning"),"%"));
+      if(out[out.length-1] !== "") out.push("");
+      addSection(out, prefix(val("dailyLogEmoji"),val("dailyLogTitle")), plainLines(val("dailyLog")));
+      addSection(out, prefix(val("geotabEmoji"),val("geotabTitle")), listify(val("geotab")));
+      addSection(out, prefix(val("callOutsEmoji"),val("callOutsTitle")), listify(val("callOuts")));
+      addSection(out, prefix(val("lateEmoji"),val("lateTitle")), listify(val("late")));
+      addSection(out, prefix(val("netradyneEmoji"),val("netradyneTitle")), listify(val("netradyne")));
+      addSection(out, prefix(val("loadoutEmoji"),val("loadoutTitle")), plainLines(val("loadout")));
+      addSection(out, prefix(val("morningNotesEmoji"),val("morningNotesTitle")), plainLines(val("notes")));
+      return cleanup(out.join("\n"));
+    }
+
+    function generateProgress(){
+      const out=[];
+      out.push(`${val("progressTitleEmoji")?val("progressTitleEmoji")+" ":""}${val("reportTime")?val("reportTime")+" ":""}${val("progressTitle")||"Report"}${val("reportDate")?" - "+fmtDate(val("reportDate")):""}`.trim());
+      if(val("station")) out.push(val("station"));
+      out.push("");
+
+      addLine(out, fieldLine(val("remainingEmoji"),val("remainingLabel"),val("remaining")));
+      addLine(out, fieldLine(val("stopProgressEmoji"),val("stopProgressLabel"),val("stopProgress"),"%"));
+      addLine(out, fieldLine(val("packageProgressEmoji"),val("packageProgressLabel"),val("packageProgress"),"%"));
+      addLine(out, fieldLine(val("attemptSuccessEmoji"),val("attemptSuccessLabel"),val("attemptSuccess"),"%"));
+      addLine(out, fieldLine(val("locationsProgressEmoji"),val("locationsProgressLabel"),val("locationsProgress"),"%"));
+      addLine(out, fieldLine(val("routesEmoji"),val("routesLabel"),val("routes")));
+      if(out[out.length-1] !== "") out.push("");
+
+      const packageStatus=[];
+      addLine(packageStatus, fieldLine("", "Reattemptable", val("reattemptable")));
+      addLine(packageStatus, fieldLine("", "Undeliverable", val("undeliverable")));
+      addLine(packageStatus, fieldLine("", "Missing", val("missing")));
+      addLine(packageStatus, fieldLine("", "Returned to station", val("returned")));
+      addLine(packageStatus, fieldLine("", "Pickup failed", val("pickupFailed")));
+      addLine(packageStatus, fieldLine("", "Infractions", val("infractions")));
+      addSection(out, prefix(val("packageStatusEmoji"),val("packageStatusTitle")), packageStatus.join("\n"));
+
+      addSection(out, prefix(val("reattemptableDetailsEmoji"),val("reattemptableDetailsTitle")), formatDetailedItems("reattemptable"));
+      addSection(out, prefix(val("missingDetailsEmoji"),val("missingDetailsTitle")), formatDetailedItems("missing"));
+      addSection(out, prefix(val("infractionsDetailsEmoji"),val("infractionsDetailsTitle")), formatDetailedItems("infraction"));
+
+      const risk=[];
+      addLine(risk, fieldLine("", "Ahead", val("ahead")));
+      addLine(risk, fieldLine("", "At risk", val("atRiskNum")));
+      addLine(risk, fieldLine("", "Behind", val("behindNum")));
+      addSection(out, prefix(val("riskLevelEmoji"),val("riskLevelTitle")), risk.join("\n"));
+
+      addSection(out, prefix(val("rescuePlanEmoji"),val("rescuePlanTitle")), listify(val("rescuePlan")));
+      addSection(out, prefix(val("behindNamesEmoji"),val("behindNamesTitle")), listify(val("behindNames")));
+      addSection(out, prefix(val("atRiskNamesEmoji"),val("atRiskNamesTitle")), listify(val("atRiskNames")));
+      addSection(out, prefix(val("missingNamesEmoji"),val("missingNamesTitle")), listify(val("missingNames")));
+      addSection(out, "", plainLines(val("notesProgress")));
+      return cleanup(out.join("\n"));
+    }
+
+    function generateClosing(){
+      const out=[];
+      out.push(`${val("closingTitleEmoji")?val("closingTitleEmoji")+" ":""}${val("closingTitle")||"Closing reports"}${val("reportDate")?" - "+fmtDate(val("reportDate")):""}`);
+      if(val("station")) out.push(val("station"));
+      out.push("");
+      addSection(out, prefix(val("prePostEmoji"),val("prePostTitle")), plainLines(val("prePostInspections")));
+      if(val("rtsSummary")||val("rtsReturned")||val("rtsGoal")){
+        const rts=[]; if(val("rtsSummary")) rts.push(plainLines(val("rtsSummary"))); if(val("rtsReturned")) rts.push(`RTS returned: ${val("rtsReturned")}`); if(val("rtsGoal")) rts.push(`Goal: ${val("rtsGoal")}`);
+        addSection(out, prefix(val("rtsEmoji"),val("rtsTitle")), rts.join("\n"));
+      }
+      addSection(out, prefix(val("eventsEmoji"),val("eventsTitle")), plainLines(val("eventsClosing")));
+      const cage=[]; if(val("cageStatus")) cage.push(plainLines(val("cageStatus"))); if(val("closingPhones")) cage.push(fieldLine(val("closingPhonesEmoji"),val("closingPhonesLabel"),val("closingPhones"))); if(val("closingChargers")) cage.push(fieldLine(val("closingChargersEmoji"),val("closingChargersLabel"),val("closingChargers")));
+      addSection(out, prefix(val("cageStatusEmoji"),val("cageStatusTitle")), cage.join("\n"));
+      addSection(out, prefix(val("completedTasksEmoji"),val("completedTasksTitle")), plainLines(val("completedTasks")));
+      addSection(out, prefix(val("pickupsClosingEmoji"),val("pickupsClosingTitle")), plainLines(val("pickupsClosing")));
+      addSection(out, prefix(val("closingExtraEmoji"),val("closingExtraTitle")), plainLines(val("closingExtra")));
+      addSection(out, prefix(val("resetClosingEmoji"),val("resetClosingTitle")), plainLines(val("resetClosing")));
+      addSection(out, "", plainLines(val("notesClosing")));
+      return cleanup(out.join("\n"));
+    }
+
+    function addNotePreset(targetId, text){
+      const el = document.getElementById(targetId);
+      if(!el) return;
+      const current = el.value.trim();
+      el.value = current ? current + "\n" + text : text;
+      persistForm();
+      generateReport();
+    }
+
+
+    
+
+
+    function applySmartProgressNotes(){
+      const notes = [];
+      const missing = Number(val("missing") || 0);
+      const reattemptable = Number(val("reattemptable") || 0);
+      const infractions = Number(val("infractions") || 0);
+      const behind = Number(val("behindNum") || 0);
+      const atRisk = Number(val("atRiskNum") || 0);
+      const attempt = Number(val("attemptSuccess") || 0);
+      const stop = Number(val("stopProgress") || 0);
+      const pkg = Number(val("packageProgress") || 0);
+
+      if(missing >= 10) notes.push("High number of missing packages under review");
+      else if(missing > 0) notes.push("Missing packages are being reviewed and tracked");
+      if(reattemptable >= 10) notes.push("Reattemptable packages are being monitored and followed up");
+      else if(reattemptable > 0) notes.push("Low reattempt count is being monitored");
+      if(infractions > 0) notes.push("Infractions reported and documented for review");
+      if(behind > 0) notes.push("Routes behind are being monitored and support will be assigned as needed");
+      if(atRisk > 0) notes.push("At-risk routes are being monitored closely");
+      if(attempt >= 98) notes.push("High attempt success is being maintained");
+      if(stop > 0 && pkg > 0 && pkg < stop) notes.push("Package progress is slightly behind stop progress and will be monitored");
+      if(stop >= 90 && pkg >= 90) notes.push("Execution progress is strong at this time");
+      if(!notes.length) notes.push("Operation is stable at this time. No major risks identified. Dispatch will continue monitoring performance.");
+      addNotePreset("notesProgress", notes.join("\n"));
+    }
+
+    function applySmartGembaNotes(){
+      const notes = [];
+      if(val("gembaPickupFail")) notes.push("Pickup Fail status has been reviewed and documented.");
+      if(val("gembaPnov")) notes.push("PNOV status has been reviewed and documented.");
+      if(val("gembaCret")) notes.push("CRET / Whole Foods status has been reviewed and documented.");
+      if(val("gembaRoadRisk")) notes.push("On-road risk has been reviewed and support plan is being monitored.");
+      if(!notes.length) notes.push("No issues reported at this time. Dispatch will continue monitoring and follow up as needed.");
+      addNotePreset("gembaActionPlan", notes.join("\n"));
+    }
+
+
+    function generateGemba(){
+      const out=[];
+      const title = `${val("gembaTime")||""} ${val("gembaTitle")||"Gemba Notes"} - ${val("gembaSite")||"CASN"}`.trim();
+      out.push(title);
+      if(val("gembaIntro")) out.push(val("gembaIntro"));
+      out.push("");
+
+      addSection(out, "• Pickup Fail status", plainLines(val("gembaPickupFail")));
+      addSection(out, "• PNOV status", plainLines(val("gembaPnov")));
+      addSection(out, "• CRET status", plainLines(val("gembaCret")));
+      addSection(out, "• On-road risk", plainLines(val("gembaRoadRisk")));
+      addSection(out, "• Action plan / extra notes", plainLines(val("gembaActionPlan")));
+
+      return cleanup(out.join("\n"));
+    }
+
+
+
+    function generateGembaTemplate(){
+      const time = val("gembaTime") || "3pm";
+      const site = val("gembaSite") || "CASN";
+      const pickup = val("gembaPickupFail");
+      const pnov = val("gembaPnov");
+      const cret = val("gembaCret");
+      const risk = val("gembaRoadRisk");
+      const action = val("gembaActionPlan");
+
+      const lines = [];
+      lines.push(`${time} Gemba Notes - ${site}`);
+      lines.push("");
+      lines.push("Please update us on the following:");
+      lines.push("");
+
+      lines.push("• Pickup Fail status:");
+      if(pickup){
+        lines.push(pickup);
+      } else {
+        lines.push("No elevated Pickup Fail concerns reported at this time. Dispatch will continue monitoring PuF status and follow up with any impacted DAs if needed.");
+      }
+      lines.push("");
+
+      lines.push("• PNOV status:");
+      if(pnov){
+        lines.push(pnov);
+      } else {
+        lines.push("No elevated PNOV concerns identified at this time. PNOV status will continue to be monitored for any driver or route-level impact.");
+      }
+      lines.push("");
+
+      lines.push("• CRET / Whole Foods status:");
+      if(cret){
+        lines.push(cret);
+      } else {
+        lines.push("CRET / Whole Foods pickup status is being monitored. Drivers are expected to confirm pickup completion, volume collection, and submit pictures when required.");
+      }
+      lines.push("");
+
+      lines.push("• On-road risk / drivers behind:");
+      if(risk){
+        lines.push(risk);
+      } else {
+        lines.push("No major on-road risk identified at this time. Routes behind or at risk will be monitored and supported as needed.");
+      }
+      lines.push("");
+
+      lines.push("• Action plan:");
+      if(action){
+        lines.push(action);
+      } else {
+        lines.push("Dispatch will continue monitoring execution progress, contact impacted drivers when needed, and assign support if operational risk increases.");
+      }
+
+      const report = cleanup(lines.join("\n"));
+      const box = document.getElementById("gembaGeneratedReport");
+      if(box) box.value = report;
+
+      // Also place it in the main preview/output for quick Telegram copy.
+      document.getElementById("output").value = report;
+      persistForm();
+    }
+
+    async function copyGembaGenerated(){
+      const box = document.getElementById("gembaGeneratedReport");
+      const text = box ? box.value.trim() : "";
+      if(!text){
+        generateGembaTemplate();
+      }
+      const finalText = (document.getElementById("gembaGeneratedReport") || {}).value || "";
+      try{
+        await navigator.clipboard.writeText(finalText);
+        alert("Gemba report copied");
+      }catch(e){
+        const output = document.getElementById("gembaGeneratedReport");
+        if(output){
+          output.select();
+          document.execCommand("copy");
+          alert("Gemba report copied");
+        }
+      }
+    }
+
+
+
+    function applyAutoAdvancedNotes(){
+      const notes = [];
+      const missing = Number(val("missing") || 0);
+      const reattemptable = Number(val("reattemptable") || 0);
+      const infractions = Number(val("infractions") || 0);
+      const behind = Number(val("behindNum") || 0);
+      const atRisk = Number(val("atRiskNum") || 0);
+      const attempt = Number(val("attemptSuccess") || 0);
+      const stop = Number(val("stopProgress") || 0);
+      const pkg = Number(val("packageProgress") || 0);
+
+      if(attempt >= 98 && infractions === 0 && missing <= 3 && behind === 0 && atRisk === 0){
+        notes.push("Operation remains stable with no significant risks. Dispatch will continue monitoring execution to ensure consistency.");
+      } else if((missing > 0 && missing < 10) || reattemptable > 0 || atRisk > 0){
+        notes.push("Minor performance deviations have been identified. Dispatch is monitoring closely and providing support where needed.");
+      } else if(missing >= 10 || infractions > 0 || behind > 0){
+        notes.push("Operational challenges have been identified. Dispatch is actively managing risk, assigning support, and monitoring performance closely.");
+      }
+
+      if(stop > 0 && pkg > 0 && pkg < stop){
+        notes.push("Performance trend identified: package progress is trailing stop progress and is being evaluated.");
+      }
+
+      if(!notes.length){
+        notes.push("Operational performance is under continuous review based on real-time data.");
+      }
+
+      addNotePreset("notesProgress", notes.join("\n"));
+    }
+
+
+    function autoGenerateFullReport(){
+      if(currentMode === "progress"){
+        autoGenerateProgressReport();
+      } else if(currentMode === "morning"){
+        autoGenerateMorningReport();
+      } else if(currentMode === "closing"){
+        autoGenerateClosingReport();
+      } else if(currentMode === "gemba"){
+        autoGenerateGembaReport();
+        generateGembaTemplate();
+      }
+      persistForm();
+      generateReport();
+    }
+
+    function setTextValue(id, text, append=false){
+      const el = document.getElementById(id);
+      if(!el) return;
+      if(append && el.value.trim()){
+        el.value = el.value.trim() + "\n" + text;
+      } else {
+        el.value = text;
+      }
+    }
+
+    function autoGenerateProgressReport(){
+      const remaining = Number(val("remaining") || 0);
+      const stop = Number(val("stopProgress") || 0);
+      const pkg = Number(val("packageProgress") || 0);
+      const attempt = Number(val("attemptSuccess") || 0);
+      const locations = Number(val("locationsProgress") || 0);
+      const reattempt = Number(val("reattemptable") || 0);
+      const missing = Number(val("missing") || 0);
+      const infractions = Number(val("infractions") || 0);
+      const behind = Number(val("behindNum") || 0);
+      const atRisk = Number(val("atRiskNum") || 0);
+      const returned = Number(val("returned") || 0);
+      const pickupFailed = Number(val("pickupFailed") || 0);
+      const undeliv = Number(val("undeliverable") || 0);
+
+      const notes = [];
+      const actions = [];
+      const risks = [];
+
+      if(attempt >= 98 && infractions === 0){
+        notes.push("Operation is performing within expected execution standards, with strong attempt success being maintained.");
+      } else if(attempt > 0 && attempt < 95){
+        risks.push("Attempt success is below the preferred threshold and will require continued monitoring.");
+      }
+
+      if(stop >= 90 && pkg >= 90){
+        notes.push("Execution progress is strong across stops and packages at this time.");
+      } else if(stop > 0 && pkg > 0 && pkg < stop - 3){
+        risks.push("Package progress is trailing stop progress and will be monitored for possible delivery execution gaps.");
+      } else if(stop > 0 || pkg > 0){
+        notes.push("Route execution is being monitored based on current stop and package progress.");
+      }
+
+      if(remaining > 0){
+        notes.push(`Remaining package volume is currently ${remaining}, and dispatch will continue monitoring completion pace.`);
+      }
+
+      if(reattempt >= 10){
+        risks.push("Reattemptable volume is elevated and may impact final completion if not actively followed up.");
+        actions.push("Dispatch is reviewing reattemptable packages and following up with impacted drivers as needed.");
+      } else if(reattempt > 0){
+        notes.push("Reattemptable packages remain at a manageable level and are being monitored.");
+      }
+
+      if(missing >= 10){
+        risks.push("Missing package count is elevated and requires active review and tracking.");
+        actions.push("Missing packages are being reviewed by TBA and driver details for follow-up.");
+      } else if(missing > 0){
+        notes.push("Missing packages are under review and being tracked.");
+      }
+
+      if(infractions > 0){
+        risks.push("Safety or compliance infractions have been identified and documented for review.");
+        actions.push("Impacted drivers will be followed up with for coaching and corrective action.");
+      } else {
+        notes.push("No new infractions are currently reflected in the report.");
+      }
+
+      if(behind > 0 || atRisk > 0){
+        risks.push("A number of routes are currently classified as behind or at-risk and require continued monitoring.");
+        actions.push("Dispatch is actively monitoring at-risk and behind routes and will assign support where needed.");
+      }
+
+      if(pickupFailed > 0){
+        risks.push("Pickup Fail events are present and should be reviewed with impacted drivers.");
+        actions.push("Pickup Fail status will be followed up and documented.");
+      }
+
+      if(returned > 0 || undeliv > 0){
+        notes.push("Returned and undeliverable package status has been reviewed and will be tracked through RTS.");
+      }
+
+      if(locations >= 90){
+        notes.push("Location progress is aligned with expected operational execution.");
+      }
+
+      if(!risks.length){
+        notes.push("No major operational risks identified at this time.");
+      }
+      if(!actions.length){
+        actions.push("Dispatch will continue monitoring performance to ensure route completion remains on track.");
+      }
+
+      const finalText = [
+        "Automated operational summary:",
+        ...notes,
+        "",
+        risks.length ? "Risk / issue review:" : "",
+        ...risks,
+        "",
+        "Action plan:",
+        ...actions
+      ].filter(line => line !== "").join("\n");
+
+      setTextValue("notesProgress", finalText, false);
+    }
+
+    function autoGenerateMorningReport(){
+      const phones = Number(val("phones") || 0);
+      const chargers = Number(val("chargers") || 0);
+      const routes = Number(val("routesMorning") || 0);
+      const total = Number(val("totalPackagesMorning") || 0);
+
+      const notes = [];
+      notes.push("Morning operation setup is being reviewed and prepared for dispatch execution.");
+
+      if(phones > 0) notes.push(`Device readiness reviewed: ${phones} phones accounted for operational use.`);
+      if(chargers > 0) notes.push(`Charging equipment reviewed: ${chargers} chargers accounted for operational use.`);
+      if(routes > 0) notes.push(`${routes} routes are prepared for dispatch and execution monitoring.`);
+      if(total > 0) notes.push(`Total package volume for the day is ${total}, and progress will be monitored throughout the operation.`);
+
+      notes.push("Dispatch will continue monitoring driver readiness, device assignment, and route departure status.");
+      setTextValue("notes", notes.join("\n"), false);
+    }
+
+    function autoGenerateClosingReport(){
+      const rtsReturned = Number(val("rtsReturned") || 0);
+      const rtsGoal = Number(val("rtsGoal") || 0);
+      const phones = Number(val("closingPhones") || 0);
+      const chargers = Number(val("closingChargers") || 0);
+
+      const notes = [];
+      notes.push("Automated closing summary:");
+      notes.push("End-of-day operational tasks have been reviewed for completion and handoff readiness.");
+
+      if(rtsReturned > 0 || rtsGoal > 0){
+        notes.push(`RTS status reviewed: ${rtsReturned || 0} returns tracked against a goal of ${rtsGoal || 0}.`);
+      }
+
+      if(phones > 0 || chargers > 0){
+        notes.push(`Device cage status reviewed: ${phones || 0} phones and ${chargers || 0} chargers accounted for.`);
+      }
+
+      notes.push("All pending items should be documented for morning follow-up if needed.");
+      notes.push("Operation has been reset and prepared for the next shift.");
+
+      setTextValue("notesClosing", notes.join("\n"), false);
+    }
+
+    function autoGenerateGembaReport(){
+      const pickup = val("gembaPickupFail");
+      const pnov = val("gembaPnov");
+      const cret = val("gembaCret");
+      const risk = val("gembaRoadRisk");
+
+      const action = [];
+      action.push("Automated Gemba action summary:");
+
+      if(pickup){
+        action.push("Pickup Fail status has been reviewed and documented for follow-up.");
+      } else {
+        action.push("No elevated Pickup Fail issue has been reported at this time.");
+      }
+
+      if(pnov){
+        action.push("PNOV status has been reviewed and impacted drivers will be followed up with as needed.");
+      } else {
+        action.push("No elevated PNOV issue has been reported at this time.");
+      }
+
+      if(cret){
+        action.push("CRET / Whole Foods pickup status has been reviewed and confirmation will be tracked.");
+      } else {
+        action.push("CRET / Whole Foods status remains pending or clear based on current update.");
+      }
+
+      if(risk){
+        action.push("On-road risk has been reviewed and support plan is being monitored.");
+      } else {
+        action.push("No major on-road risk has been identified at this time.");
+      }
+
+      action.push("Dispatch will continue monitoring and follow up as needed.");
+
+      setTextValue("gembaActionPlan", action.join("\n"), false);
+    }
+
+
+    function generateReport(){
+      updateKpis();
+      let text="";
+      if(currentMode==="morning") text=generateMorning();
+      else if(currentMode==="progress") text=generateProgress();
+      else if(currentMode==="closing") text=generateClosing();
+      else text=generateGemba();
+      document.getElementById("output").value=text;
+      persistForm();
+    }
+
+    async function copyReport(){
+      const output=document.getElementById("output");
+      if(!output.value.trim()) generateReport();
+      try{ await navigator.clipboard.writeText(output.value); alert("Report copied"); }
+      catch(e){ output.select(); document.execCommand("copy"); alert("Report copied"); }
+    }
+
+    function downloadTxt(){
+      const output=document.getElementById("output");
+      if(!output.value.trim()) generateReport();
+      const blob=new Blob([output.value],{type:"text/plain;charset=utf-8"});
+      const a=document.createElement("a");
+      let name=currentMode+"_report"; if(currentMode==="progress") name=(val("reportTime")||"progress_report").replace(/[^a-z0-9]+/gi,"_"); if(currentMode==="gemba") name=(val("gembaTime")||"gemba_notes").replace(/[^a-z0-9]+/gi,"_")+"_gemba_notes";
+      a.href=URL.createObjectURL(blob); a.download=`${name}.txt`; a.click(); URL.revokeObjectURL(a.href);
+    }
+
+    function clearCurrent(){
+      if(currentMode==="morning"){
+        ["phones","chargers","gasCards","routesMorning","totalPackagesMorning","remainingMorning","stopMorning","packageMorning","attemptMorning","dailyLog","geotab","callOuts","late","netradyne","loadout","notes"].forEach(id=>document.getElementById(id).value="");
+      } else if(currentMode==="progress"){
+        ["remaining","routes","stopProgress","packageProgress","attemptSuccess","locationsProgress","reattemptable","missing","undeliverable","returned","pickupFailed","infractions","ahead","atRiskNum","behindNum","rescuePlan","behindNames","atRiskNames","missingNames","notesProgress"].forEach(id=>document.getElementById(id).value="");
+        document.getElementById("reattemptableRows").innerHTML="";
+        document.getElementById("missingRows").innerHTML="";
+        document.getElementById("infractionsRows").innerHTML="";
+        addRepeatRow('reattemptableRows','reattemptable');
+        addRepeatRow('missingRows','missing');
+        addRepeatRow('infractionsRows','infraction');
+      } else {
+        ["prePostInspections","rtsSummary","eventsClosing","cageStatus","rtsReturned","rtsGoal","closingPhones","closingChargers","completedTasks","pickupsClosing","closingExtra","resetClosing","notesClosing","gembaTime","gembaSite","gembaTitle","gembaIntro","gembaPickupFail","gembaPnov","gembaCret","gembaRoadRisk","gembaActionPlan","gembaGeneratedReport"].forEach(id=>document.getElementById(id).value="");
+      }
+      generateReport(); persistForm();
+    }
+
+    function saveSnapshot(){
+      if(!document.getElementById("output").value.trim()) generateReport();
+      const item={ mode:currentMode, time:currentMode==="morning"?"Morning Report":currentMode==="progress"?(val("reportTime")||"Progress Report"):currentMode==="closing"?"Closing Report":"Gemba Notes", createdAt:new Date().toLocaleString(), report:document.getElementById("output").value };
+      const history=JSON.parse(localStorage.getItem("telegram_report_history")||"[]");
+      history.unshift(item); localStorage.setItem("telegram_report_history",JSON.stringify(history.slice(0,25))); renderHistory(); alert("Report saved");
+    }
+
+    function renderHistory(){
+      const history=JSON.parse(localStorage.getItem("telegram_report_history")||"[]");
+      const box=document.getElementById("history");
+      if(!history.length){ box.innerHTML='<div class="small">No saved reports yet.</div>'; return; }
+      box.innerHTML=history.map((item,idx)=>`<div class="history-item"><strong>${item.time} — ${item.createdAt}</strong><div class="actions" style="margin:8px 0 0;"><button class="secondary" onclick="useHistory(${idx})">Load</button><button class="ghost" onclick="copyHistory(${idx})">Copy</button><button class="warn" onclick="deleteHistory(${idx})">Delete</button></div><div class="mono">${escapeHtml(item.report)}</div></div>`).join("");
+    }
+
+    async function copyHistory(index){
+      const history=JSON.parse(localStorage.getItem("telegram_report_history")||"[]");
+      const text=history[index]?.report||""; if(!text) return;
+      try{ await navigator.clipboard.writeText(text); alert("Report copied"); }catch(e){}
+    }
+
+    function useHistory(index){
+      const history=JSON.parse(localStorage.getItem("telegram_report_history")||"[]");
+      const item=history[index]; if(!item) return;
+      document.getElementById("output").value=item.report; setMode(item.mode||"morning"); alert("Report loaded");
+    }
+
+    function deleteHistory(index){
+      const history=JSON.parse(localStorage.getItem("telegram_report_history")||"[]");
+      history.splice(index,1); localStorage.setItem("telegram_report_history",JSON.stringify(history)); renderHistory();
+    }
+
+    function persistForm(){
+      const data={ currentMode };
+      dataIds.forEach(id=>{ const el=document.getElementById(id); if(el) data[id]=el.value; });
+      settingsIds.forEach(id=>{ const el=document.getElementById(id); if(el) data[id]=el.value; });
+      data.reattemptableItems=collectRepeatRows("reattemptable");
+      data.missingItems=collectRepeatRows("missing");
+      data.infractionItems=collectRepeatRows("infraction");
+      localStorage.setItem("telegram_report_form_v7",JSON.stringify(data));
+    }
+
+    function loadForm(){
+      const data=JSON.parse(localStorage.getItem("telegram_report_form_v7")||"{}");
+      [...dataIds, ...settingsIds].forEach(id=>{ const el=document.getElementById(id); if(el && data[id]!==undefined) el.value=data[id]; });
+      if(!document.getElementById("reportDate").value) document.getElementById("reportDate").value=todayISO();
+
+      document.getElementById("reattemptableRows").innerHTML="";
+      document.getElementById("missingRows").innerHTML="";
+      document.getElementById("infractionsRows").innerHTML="";
+
+      const rItems = Array.isArray(data.reattemptableItems)&&data.reattemptableItems.length ? data.reattemptableItems : [{}];
+      const mItems = Array.isArray(data.missingItems)&&data.missingItems.length ? data.missingItems : [{}];
+      const iItems = Array.isArray(data.infractionItems)&&data.infractionItems.length ? data.infractionItems : [{}];
+
+      rItems.forEach(item=>addRepeatRow("reattemptableRows","reattemptable",item));
+      mItems.forEach(item=>addRepeatRow("missingRows","missing",item));
+      iItems.forEach(item=>addRepeatRow("infractionsRows","infraction",item));
+
+      currentMode=data.currentMode||"morning";
+      initSettingsSync();
+      refreshSettingsProxyValues();
+      normalizeReportDateInput();
+      setMode(currentMode);
+      showSettingsPanel("morning");
+      showView("main");
+    }
+
+    function resetSettingsDefaults(){
+      const defaults = {
+        morningTitle:"Morning Report", morningTitleEmoji:"☀️", morningNotesTitle:"Notes", morningNotesEmoji:"📝",
+        phonesLabel:"Phones", phonesEmoji:"📱", chargersLabel:"Chargers", chargersEmoji:"🔌", gasCardsLabel:"Gas cards", gasCardsEmoji:"⛽",
+        routesMorningLabel:"Routes", routesMorningEmoji:"🛣️", totalPackagesMorningLabel:"Total packages today", totalPackagesMorningEmoji:"📦",
+        remainingMorningLabel:"Remaining packages", remainingMorningEmoji:"❗", stopMorningLabel:"Stop progress", stopMorningEmoji:"🛑",
+        packageMorningLabel:"Package progress", packageMorningEmoji:"📬", attemptMorningLabel:"Attempt success", attemptMorningEmoji:"✅",
+        dailyLogTitle:"Daily Log and LMD Max", dailyLogEmoji:"🗂️", geotabTitle:"GEOTAB", geotabEmoji:"🛰️", callOutsTitle:"Call outs", callOutsEmoji:"📞",
+        lateTitle:"Late", lateEmoji:"⏰", netradyneTitle:"Netradyne", netradyneEmoji:"🎥", loadoutTitle:"Load out", loadoutEmoji:"🚚",
+        progressTitle:"Report", progressTitleEmoji:"⏰", routesLabel:"Routes", routesEmoji:"🛣️", remainingLabel:"Remaining packages", remainingEmoji:"📦",
+        stopProgressLabel:"Stop progress", stopProgressEmoji:"🛑", packageProgressLabel:"Package progress", packageProgressEmoji:"📬",
+        attemptSuccessLabel:"Attempt success", attemptSuccessEmoji:"✅", locationsProgressLabel:"Locations progress", locationsProgressEmoji:"📍",
+        packageStatusTitle:"Package status", packageStatusEmoji:"📌", reattemptableDetailsTitle:"Reattempts", reattemptableDetailsEmoji:"",
+        missingDetailsTitle:"Missing", missingDetailsEmoji:"", infractionsDetailsTitle:"Infractions", infractionsDetailsEmoji:"🚨",
+        riskLevelTitle:"Risk level", riskLevelEmoji:"⚠️", rescuePlanTitle:"Rescue plan / sweepers", rescuePlanEmoji:"🚚",
+        behindNamesTitle:"Behind", behindNamesEmoji:"🔴", atRiskNamesTitle:"At risk", atRiskNamesEmoji:"🟡",
+        missingNamesTitle:"Missing details", missingNamesEmoji:"❓", closingTitle:"Closing reports", closingTitleEmoji:"🌙",
+        prePostTitle:"", prePostEmoji:"✅", rtsTitle:"RTS", rtsEmoji:"", eventsTitle:"Events", eventsEmoji:"",
+        cageStatusTitle:"", cageStatusEmoji:"", closingPhonesLabel:"📱 Phones", closingPhonesEmoji:"📱",
+        closingChargersLabel:"🔋 Chargers", closingChargersEmoji:"🔋", completedTasksTitle:"", completedTasksEmoji:"",
+        pickupsClosingTitle:"", pickupsClosingEmoji:"", closingExtraTitle:"", closingExtraEmoji:"", resetClosingTitle:"", resetClosingEmoji:""
+      };
+      Object.entries(defaults).forEach(([id, value])=>{ const el=document.getElementById(id); if(el) el.value=value; });
+      refreshSettingsProxyValues();
+      persistForm();
+      updateKpis();
+      generateReport();
+      alert("Default settings restored");
+    }
+
+    
+    function todayISO(){
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function normalizeDateForInput(value){
+      if(!value) return todayISO();
+      value = String(value).trim();
+
+      if(/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+
+      const slash = value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if(slash){
+        let a = Number(slash[1]);
+        let b = Number(slash[2]);
+        const yyyy = slash[3];
+
+        // If old saved value was DD/MM/YYYY, convert to MM/DD/YYYY logic.
+        // For browser input, final value must be YYYY-MM-DD.
+        let mm = a;
+        let dd = b;
+        if(a > 12 && b <= 12){
+          mm = b;
+          dd = a;
+        }
+
+        return `${yyyy}-${String(mm).padStart(2,"0")}-${String(dd).padStart(2,"0")}`;
+      }
+
+      return todayISO();
+    }
+
+    function normalizeReportDateInput(){
+      const el = document.getElementById("reportDate");
+      if(!el) return;
+      el.value = normalizeDateForInput(el.value);
+    }
+
+
+function escapeHtml(str){
+      return (str||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    [...dataIds, ...settingsIds].forEach(id=>{ const el=document.getElementById(id); if(el){ el.addEventListener("input",()=>{ persistForm(); updateKpis(); generateReport(); refreshSettingsProxyValues(); }); } });
+
+    loadForm();
+    renderHistory();
+    generateReport();
+  </script>
+</body>
+</html>
