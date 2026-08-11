@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Report Generator — Capital Shipping</title>
+<style>
+:root{
+  --bg:#f0f2f5;--card:#ffffff;--card2:#f7f8fa;--border:#d0d5dd;
+  --text:#1a1d23;--muted:#6b7280;--dim:#9ca3af;
+  --navy:#1e3a5f;--navy2:#2d5282;--blue:#2563eb;
+  --green:#16a34a;--red:#dc2626;--amber:#d97706;--purple:#7c3aed;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.45}
+.wrap{padding:14px 18px 60px}
+/* header */
+.top{background:var(--navy);padding:13px 18px;border-radius:9px;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px;box-shadow:0 2px 10px rgba(30,58,95,.22)}
+.top h1{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.2px}
+.top p{font-size:11px;color:rgba(255,255,255,.58);margin-top:1px}
+.top-nav{display:flex;gap:6px;flex-wrap:wrap}
+/* buttons */
+button{border:none;border-radius:6px;padding:7px 13px;cursor:pointer;font-weight:600;font-size:12px;font-family:inherit;transition:background .12s,color .12s}
+.bp{background:var(--blue);color:#fff}.bp:hover{background:#1d4ed8}
+.bg{background:var(--card2);color:var(--navy);border:1px solid var(--border)}.bg:hover{background:#e8ecf2}
+.ba{background:#fff;color:var(--navy);font-weight:700}
+.bs{background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0}.bs:hover{background:#dcfce7}
+.bw{background:#fef2f2;color:var(--red);border:1px solid #fecaca}.bw:hover{background:#fee2e2}
+.bd{background:var(--card2);color:var(--muted);border:1px solid var(--border)}.bd:hover{color:var(--text)}
+.sm{padding:5px 9px;font-size:11px}
+/* tabs */
+.tabs{display:flex;gap:5px;margin-bottom:11px;flex-wrap:wrap}
+.tab{padding:7px 15px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-weight:600;font-size:12px;cursor:pointer;font-family:inherit}
+.tab.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.tab:not(.on):hover{color:var(--blue);border-color:var(--blue)}
+/* layout */
+.layout{display:grid;grid-template-columns:1fr 380px;gap:13px;align-items:start}
+.card{background:var(--card);border:1px solid #e2e5ea;border-radius:9px;padding:17px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card h2{font-size:13px;font-weight:800;color:var(--navy);margin-bottom:11px;text-transform:uppercase;letter-spacing:.4px;padding-bottom:8px;border-bottom:2px solid #e8eef5}
+/* form */
+.sl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin:13px 0 6px;display:flex;align-items:center;gap:6px}
+.sl::after{content:'';flex:1;height:1px;background:#e2e5ea}
+.sl.ok{color:var(--green)}.sl.ok::before{content:'✓ ';font-weight:900}
+label{display:block;font-size:10px;font-weight:700;margin-bottom:3px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff;color:var(--text);font-family:inherit;transition:border-color .12s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.09)}
+textarea{resize:vertical;line-height:1.5;min-height:68px;background:#fafafa}
+select{cursor:pointer}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.chip{padding:4px 9px;border-radius:20px;border:1px solid var(--border);background:#fff;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit}
+.chip:hover{border-color:var(--blue);color:var(--blue);background:#eff6ff}
+.cg{background:#f0fdf4;color:var(--green);border-color:#bbf7d0}.cg:hover{background:#dcfce7}
+.cy{background:#fffbeb;color:var(--amber);border-color:#fde68a}.cy:hover{background:#fef3c7}
+.cr{background:#fef2f2;color:var(--red);border-color:#fecaca}.cr:hover{background:#fee2e2}
+.cb{background:#eff6ff;color:var(--blue);border-color:#bfdbfe}.cb:hover{background:#dbeafe}
+.cp{background:#f5f3ff;color:var(--purple);border-color:#ddd6fe}.cp:hover{background:#ede9fe}
+.cq{background:var(--navy);color:#fff;border:none}.cq:hover{background:var(--navy2)}
+.cbox{border:1px solid #e2e5ea;border-radius:7px;padding:8px 10px;margin-top:7px;background:var(--card2)}
+.cbox-t{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+/* dynamic rows */
+.nrow{display:grid;grid-template-columns:1fr auto;gap:6px;margin-bottom:5px;align-items:center}
+.corow{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin-bottom:5px;align-items:center}
+.irow{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin-bottom:6px;align-items:center}
+.corow select,.irow select{padding:7px 9px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff;color:var(--text);font-family:inherit}
+.rrow{border:1px solid var(--border);border-radius:7px;padding:9px;margin-bottom:7px;background:#fafafa}
+.rrow-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.rrow-h span{font-size:11px;font-weight:700;color:var(--navy)}
+.rchips{margin-top:6px;padding-top:6px;border-top:1px solid #e2e5ea}
+.rchips-t{font-size:10px;color:var(--dim);font-weight:700;text-transform:uppercase;margin-bottom:4px}
+/* preview */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:11px}
+.kpi{border:1px solid #e2e5ea;border-radius:7px;padding:9px 11px;background:var(--card2);border-top:3px solid var(--navy)}
+.kn{font-size:20px;font-weight:900;color:var(--navy);line-height:1;margin-bottom:2px}
+.kl{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.output{width:100%;min-height:580px;white-space:pre-wrap;font-size:13px;line-height:1.75;background:#fafafa;border-radius:7px;padding:13px;border:1px solid var(--border);color:var(--text);resize:vertical;font-family:inherit}
+/* history */
+.hi{border:1px solid #e2e5ea;border-radius:7px;padding:10px;margin-bottom:7px;background:#fff}
+.hi-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.hi-lb{font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase}
+.hi-t{font-size:10px;color:var(--muted)}
+.hi-tx{font-size:11px;color:var(--muted);max-height:90px;overflow:auto;background:var(--card2);padding:7px;border-radius:5px;border:1px solid #e2e5ea;white-space:pre-wrap;margin-top:5px}
+.hi-btn{display:flex;gap:5px;margin-top:6px}
+/* util */
+.hidden{display:none}
+.abar{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px;padding-top:11px;border-top:1px solid #e2e5ea}
+.fab{position:fixed;bottom:22px;right:20px;z-index:999;background:var(--green);color:#fff;border:none;border-radius:50px;padding:15px 28px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 5px 18px rgba(22,163,74,.4);font-family:inherit}
+.fab:hover{background:#15803d;transform:translateY(-2px)}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 17px;border-radius:7px;font-size:12px;font-weight:600;z-index:9999;display:none;box-shadow:0 3px 12px rgba(0,0,0,.15)}
+.toast.on{display:block;animation:tout 3s forwards}
+@keyframes tout{0%{opacity:0;top:6px}10%{opacity:1;top:16px}80%{opacity:1;top:16px}100%{opacity:0;top:6px}}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ssec{border:1px solid #e2e5ea;border-radius:7px;padding:11px;background:var(--card2)}
+.ssec h3{font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px}
+@media(max-width:1180px){.layout{grid-template-columns:1fr}}
+@media(max-width:800px){.g4{grid-template-columns:1fr 1fr}.kpis{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.g2,.g3,.g4,.kpis{grid-template-columns:1fr}.wrap{padding:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="top">
+  <div>
+    <h1>Report Generator — Capital Shipping</h1>
+    <p>Morning · Progress · Closing · Gemba</p>
+  </div>
+  <div class="top-nav">
+    <button id="nbMain" class="ba" onclick="showView('main')">📊 Builder</button>
+    <button id="nbSet"  class="bg" onclick="showView('settings')">⚙️ Settings</button>
+    <button class="bw sm" onclick="hardReset()">🗑️ Clear cache</button>
+  </div>
+</div>
+
+<button class="fab" onclick="doCopy()">📋 Copy</button>
+<div class="toast" id="toast"></div>
+
+<!-- ═══ MAIN ═══ -->
+<div id="vMain">
+  <div class="tabs">
+    <button id="tM" class="tab on" onclick="setTab('M')">☀️ Morning</button>
+    <button id="tP" class="tab"    onclick="setTab('P')">⏰ Progress</button>
+    <button id="tC" class="tab"    onclick="setTab('C')">🌙 Closing</button>
+    <button id="tG" class="tab"    onclick="setTab('G')">📋 Gemba</button>
+  </div>
+
+  <div class="layout">
+    <div class="card">
+      <h2 id="ftitle">Morning Report</h2>
+
+      <!-- shared -->
+      <div class="g3">
+        <div>
+          <label>Station</label>
+          <select id="xStnSel" onchange="onStn(this.value)">
+            <option value="">— Select —</option>
+            <option value="DBA5">DBA5</option>
+            <option value="DDW7">DDW7</option>
+            <option value="__o">Other (type below)</option>
+          </select>
+          <input id="xStnTxt" style="margin-top:5px;display:none">
+        </div>
+        <div><label>Date</label><input id="xDate" type="date"></div>
+        <div id="xTimeWrap"><label>Report time</label>
+          <select id="xTime">
+            <option>12:00 PM</option><option>2:00 PM</option>
+            <option>4:00 PM</option><option>6:00 PM</option><option>8:00 PM</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ── MORNING ── -->
+      <div id="secM">
+        <div class="sl">Opening Team</div>
+        <div id="dTeam"></div>
+        <button class="bd sm" style="margin-bottom:6px" onclick="addName('dTeam','mTeam')">+ Add dispatcher</button>
+        <textarea id="mTeam" style="display:none"></textarea>
+
+        <div class="sl" id="slEquip">Equipment</div>
+        <div class="g4">
+          <div><label>Phones</label><input id="mPh" type="number"></div>
+          <div><label>Chargers</label><input id="mCh" type="number"></div>
+          <div><label>Gas cards</label><input id="mGs" type="number"></div>
+          <div><label>Routes</label><input id="mRt" type="number"></div>
+        </div>
+
+        <div class="sl" id="slExec">Execution</div>
+        <div class="g4">
+          <div><label>Total packages</label><input id="mTp" type="number"></div>
+          <div><label>Remaining</label><input id="mRem" type="number"></div>
+          <div><label>Stop %</label><input id="mStp" type="number"></div>
+          <div><label>Package %</label><input id="mPkg" type="number"></div>
+          <div><label>Attempt %</label><input id="mAtt" type="number"></div>
+          <div><label>Locations %</label><input id="mLoc" type="number"></div>
+        </div>
+
+        <div class="sl" id="slDl">Daily Log / LMD Max</div>
+        <div class="g2">
+          <div><label>Daily Log</label>
+            <select id="mDl"><option value="">—</option><option>In progress</option><option>Completed ✅</option></select>
+          </div>
+          <div><label>LMD Max</label>
+            <select id="mLmd"><option value="">—</option><option>In progress</option><option>Completed ✅</option></select>
+          </div>
+        </div>
+
+        <div class="sl" id="slGeo">GEOTAB</div>
+        <div id="dGeo"></div>
+        <button class="bd sm" style="margin-bottom:6px" onclick="addName('dGeo','mGeo')">+ Add driver</button>
+        <textarea id="mGeo" style="display:none"></textarea>
+
+        <div class="sl" id="slCo">Call outs</div>
+        <div id="dCo"></div>
+        <button class="bd sm" style="margin-bottom:6px" onclick="addCallOut()">+ Add call out</button>
+        <textarea id="mCo" style="display:none"></textarea>
+
+        <div class="sl">No Call / No Show</div>
+        <textarea id="mNcns"></textarea>
+
+        <div class="sl">Late</div>
+        <textarea id="mLate"></textarea>
+
+        <div class="sl">Netradyne <span style="font-size:10px;color:var(--red);margin-left:4px;font-weight:600">infractions</span></div>
+        <div id="dInfrM"></div>
+        <button class="bd sm" style="margin-bottom:9px" onclick="addInfr('dInfrM','mNet')">+ Add infraction</button>
+        <textarea id="mNet" style="display:none"></textarea>
+
+        <div class="sl">Load out</div>
+        <textarea id="mLoad"></textarea>
+        <div class="cbox">
+          <div class="cbox-t">Load out — quick fill</div>
+          <div class="chips">
+            <button class="chip cg" onclick="setTo('mLoad','Load out completed with no issues')">✅ No issues</button>
+            <button class="chip cg" onclick="addTo('mLoad','All package carts were staged correctly and on time')">Carts staged on time</button>
+            <button class="chip cg" onclick="addTo('mLoad','No missing carts reported during load out')">No missing carts</button>
+            <button class="chip cg" onclick="addTo('mLoad','All routes were loaded and dispatched without delays')">Loaded on time</button>
+            <button class="chip cg" onclick="addTo('mLoad','Cart count matched route count with no discrepancies')">Cart count matched</button>
+            <button class="chip cg" onclick="addTo('mLoad','Both waves loaded out smoothly with full cart availability')">Both waves smooth</button>
+          </div>
+          <div class="chips" style="margin-top:5px">
+            <button class="chip cy" onclick="addTo('mLoad','There were delays with the package carts during load out')">⚠️ Cart delays</button>
+            <button class="chip cy" onclick="addTo('mLoad','Cart availability was limited at the start of load out')">Limited carts</button>
+            <button class="chip cy" onclick="addTo('mLoad','Some carts arrived late to the staging area, delaying dispatch')">Carts arrived late</button>
+            <button class="chip cy" onclick="addTo('mLoad','Carts were staged out of order and had to be reorganized before dispatch')">Carts out of order</button>
+            <button class="chip cy" onclick="addTo('mLoad','A few carts were missing packages and had to be re-scanned')">Missing pkgs in cart</button>
+            <button class="chip cy" onclick="addTo('mLoad','Load out started late because carts were not released from the station on time')">Late release from station</button>
+            <button class="chip cy" onclick="addTo('mLoad','Some DAs had to wait for their carts to be brought to the staging lane')">DAs waiting on carts</button>
+            <button class="chip cy" onclick="addTo('mLoad','Cart shortage required carts to be shared between routes')">Cart shortage</button>
+          </div>
+          <div class="chips" style="margin-top:5px">
+            <button class="chip cr" onclick="addTo('mLoad','Significant cart delays impacted departure times for multiple routes')">🔴 Major cart delays</button>
+            <button class="chip cr" onclick="addTo('mLoad','Damaged carts were pulled from service and replaced before dispatch')">Damaged carts</button>
+            <button class="chip cb" onclick="addTo('mLoad','Issue was reported to the station and addressed before dispatch')">Reported to station</button>
+            <button class="chip cb" onclick="addTo('mLoad','Dispatch adjusted staging to recover time lost during load out')">Staging adjusted</button>
+            <button class="chip cb" onclick="addTo('mLoad','All DAs were dispatched on time despite the cart issues')">Dispatched on time anyway</button>
+          </div>
+        </div>
+
+        <div class="sl" id="slNotes">Notes</div>
+        <textarea id="mNotes"></textarea>
+        <div class="cbox">
+          <div class="cbox-t">Quick notes</div>
+          <div class="chips">
+            <button class="chip cg" onclick="addTo('mNotes','Both waves dispatched with no major issues')">Both waves dispatched</button>
+            <button class="chip cg" onclick="addTo('mNotes','All routes departed the station on schedule')">Routes departed on time</button>
+            <button class="chip cg" onclick="addTo('mNotes','Phones and chargers were checked and organized')">Devices organized</button>
+            <button class="chip cg" onclick="addTo('mNotes','Drivers checked in and were ready for stand-up')">Drivers ready</button>
+            <button class="chip cg" onclick="addTo('mNotes','Stand-up was completed with full attendance')">Stand-up complete</button>
+            <button class="chip cg" onclick="addTo('mNotes','Full route coverage — no open routes this morning')">Full coverage</button>
+            <button class="chip cy" onclick="addTo('mNotes','Daily log and LMD Max are in progress')">Daily log in progress</button>
+            <button class="chip cy" onclick="addTo('mNotes','Late arrivals are being monitored and documented')">Late arrivals monitored</button>
+            <button class="chip cy" onclick="addTo('mNotes','Call outs have been reviewed and coverage is being adjusted')">Call outs reviewed</button>
+            <button class="chip cy" onclick="addTo('mNotes','A few routes departed behind schedule and are being tracked')">Late departures</button>
+            <button class="chip cy" onclick="addTo('mNotes','Device shortage — some DAs were paired with backup phones')">Device shortage</button>
+            <button class="chip cr" onclick="addTo('mNotes','Higher than normal call out volume this morning impacted route assignments')">Heavy call outs</button>
+            <button class="chip cr" onclick="addTo('mNotes','Open routes remain uncovered and are being escalated')">Open routes</button>
+            <button class="chip cb" onclick="addTo('mNotes','Dispatch will continue monitoring start-up performance')">Continue monitoring</button>
+            <button class="chip cb" onclick="addTo('mNotes','Route coverage was adjusted based on attendance and availability')">Coverage adjusted</button>
+            <button class="chip cb" onclick="addTo('mNotes','Rescue plan is on standby if any route falls behind')">Rescue on standby</button>
+            <button class="chip cp" onclick="autoMorning()">✨ Auto generate</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROGRESS ── -->
+      <div id="secP" class="hidden">
+        <div class="sl">Execution numbers</div>
+        <div class="g4">
+          <div><label>Remaining</label><input id="pRem" type="number"></div>
+          <div><label>Stop %</label><input id="pStp" type="number"></div>
+          <div><label>Package %</label><input id="pPkg" type="number"></div>
+          <div><label>Attempt %</label><input id="pAtt" type="number"></div>
+          <div><label>Locations %</label><input id="pLoc" type="number"></div>
+          <div><label>Routes</label><input id="pRt" type="number"></div>
+        </div>
+
+        <div class="sl">Package status</div>
+        <div class="g4">
+          <div><label>Reattemptable</label><input id="pRea" type="number"></div>
+          <div><label>Undeliverable</label><input id="pUnd" type="number"></div>
+          <div><label>Missing</label><input id="pMis" type="number"></div>
+          <div><label>Returned</label><input id="pRet" type="number"></div>
+          <div><label>Pickup failed</label><input id="pPuf" type="number"></div>
+        </div>
+
+        <div class="sl">Reattemptable details</div>
+        <div class="chips" style="margin-bottom:7px">
+          <button class="chip cq" onclick="qRow('dRea','R','Access problem — no entry')">🔒 Access</button>
+          <button class="chip cq" onclick="qRow('dRea','R','Business closed at time of delivery')">🏢 Biz Closed</button>
+          <button class="chip cq" onclick="qRow('dRea','R','OTP not received by customer')">📲 OTP</button>
+          <button class="chip cq" onclick="qRow('dRea','R','Customer not home — no response')">🏠 Not Home</button>
+          <button class="chip cq" onclick="qRow('dRea','R','Gate/code issue — no entry')">🚪 Gate</button>
+          <button class="chip cq" onclick="qRow('dRea','R','Dog or safety concern')">🐕 Dog</button>
+        </div>
+        <div id="dRea"></div>
+        <button class="bd sm" onclick="addRow('dRea','R')">+ Add row</button>
+
+        <div class="sl">Missing details</div>
+        <div class="chips" style="margin-bottom:7px">
+          <button class="chip cq" onclick="qRow('dMis','M','Not found in vehicle')">🔍 Not in van</button>
+          <button class="chip cq" onclick="qRow('dMis','M','Possible misload — wrong route')">📦 Misload</button>
+          <button class="chip cq" onclick="qRow('dMis','M','Delivered — no scan recorded')">✅ No scan</button>
+          <button class="chip cq" onclick="qRow('dMis','M','Left behind at station')">🏭 Left at stn</button>
+          <button class="chip cq" onclick="qRow('dMis','M','Under investigation')">🔎 Under review</button>
+        </div>
+        <div id="dMis"></div>
+        <button class="bd sm" onclick="addRow('dMis','M')">+ Add row</button>
+
+        <div class="sl">Infractions</div>
+        <div class="g4" style="margin-bottom:9px">
+          <div><label>Count (optional)</label><input id="pInfN" type="number"></div>
+        </div>
+        <div id="dInfrP"></div>
+        <button class="bd sm" style="margin-bottom:9px" onclick="addInfr('dInfrP','pInfD')">+ Add infraction</button>
+        <textarea id="pInfD" style="display:none"></textarea>
+
+        <div class="sl">Risk level</div>
+        <div class="g3">
+          <div><label>Ahead</label><input id="pAhd" type="number"></div>
+          <div><label>At risk</label><input id="pAR" type="number"></div>
+          <div><label>Behind</label><input id="pBeh" type="number"></div>
+        </div>
+
+        <div class="sl">Rescue plan / sweepers</div>
+        <textarea id="pResc"></textarea>
+        <div class="sl">Behind names</div>
+        <textarea id="pBehN"></textarea>
+        <div class="sl">At risk names</div>
+        <textarea id="pARN"></textarea>
+
+        <div class="sl">Access problems</div>
+        <div id="dAcc"></div>
+        <button class="bd sm" style="margin-bottom:9px" onclick="addAcc()">+ Add access problem</button>
+        <textarea id="pAcc" style="display:none"></textarea>
+
+        <div class="sl">Notes</div>
+        <textarea id="pNotes"></textarea>
+        <div class="cbox">
+          <div class="cbox-t">Quick notes</div>
+          <div class="chips">
+            <button class="chip cg" onclick="addTo('pNotes','Operation is stable at this time')">Stable</button>
+            <button class="chip cg" onclick="addTo('pNotes','All routes are progressing as expected')">Routes on track</button>
+            <button class="chip cg" onclick="addTo('pNotes','No major delivery issues reported at this time')">No major issues</button>
+            <button class="chip cg" onclick="addTo('pNotes','High attempt success is being maintained')">High attempt success</button>
+            <button class="chip cy" onclick="addTo('pNotes','Monitoring a few routes closely')">Monitoring routes</button>
+            <button class="chip cy" onclick="addTo('pNotes','A few drivers are slightly behind but under control')">Slightly behind</button>
+            <button class="chip cy" onclick="addTo('pNotes','Access problems continue to be the main issue for some deliveries')">Access issues</button>
+            <button class="chip cy" onclick="addTo('pNotes','Business closed locations are impacting some routes')">Biz closed</button>
+            <button class="chip cr" onclick="addTo('pNotes','Several routes are falling behind and are being monitored closely')">Routes behind</button>
+            <button class="chip cr" onclick="addTo('pNotes','High number of missing packages under review')">High missing</button>
+            <button class="chip cb" onclick="addTo('pNotes','Dispatch will continue monitoring performance and follow up as needed')">Continue monitoring</button>
+            <button class="chip cb" onclick="addTo('pNotes','Rescues have been assigned where needed')">Rescues assigned</button>
+            <button class="chip cb" onclick="addTo('pNotes','Drivers have been contacted and coached')">Drivers contacted</button>
+            <button class="chip cp" onclick="autoProgress()">✨ Auto generate</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CLOSING ── -->
+      <div id="secC" class="hidden">
+        <div class="sl">Pre/Post inspections</div>
+        <textarea id="cPrePost"></textarea>
+
+        <div class="sl">RTS</div>
+        <div class="g3">
+          <div><label>Summary</label><textarea id="cRtsSum" style="min-height:46px"></textarea></div>
+          <div><label>Returned</label><input id="cRtsRet" type="number"></div>
+          <div><label>Goal</label><input id="cRtsGoal" type="number"></div>
+        </div>
+
+        <div class="sl">Events</div>
+        <textarea id="cEvents"></textarea>
+
+        <div class="sl">Cage / devices</div>
+        <div class="g3">
+          <div><label>Cage status</label><textarea id="cCage" style="min-height:46px"></textarea></div>
+          <div><label>Phones</label><input id="cPh" type="number"></div>
+          <div><label>Chargers</label><input id="cCh" type="number"></div>
+        </div>
+
+        <div class="sl">Completed tasks</div>
+        <textarea id="cTasks"></textarea>
+        <div class="chips">
+          <button class="chip cg" onclick="addTo('cTasks','Daily log completed ✅')">Daily log ✅</button>
+          <button class="chip cg" onclick="addTo('cTasks','Rescues uploaded to MAX ✅')">Rescues ✅</button>
+          <button class="chip cg" onclick="addTo('cTasks','RTS tracker updated ✅')">RTS ✅</button>
+          <button class="chip cg" onclick="addTo('cTasks','Sweeper tracker updated ✅')">Sweeper ✅</button>
+          <button class="chip cg" onclick="addTo('cTasks','Write-up tracker completed ✅')">Write-up ✅</button>
+        </div>
+
+        <div class="sl">Pickups</div>
+        <textarea id="cPick"></textarea>
+
+        <div class="sl">Notes</div>
+        <textarea id="cNotes"></textarea>
+        <div class="cbox">
+          <div class="cbox-t">Quick notes</div>
+          <div class="chips">
+            <button class="chip cg" onclick="addTo('cNotes','All pre and post inspections cleared out for tonight ✅')">Inspections cleared</button>
+            <button class="chip cg" onclick="addTo('cNotes','No new infractions ✅')">No infractions</button>
+            <button class="chip cg" onclick="addTo('cNotes','All pickups were successful today and have been submitted to Slack.')">Pickups done</button>
+            <button class="chip cg" onclick="addTo('cNotes','Cage locked and secured with all devices charged / charging')">Cage secured</button>
+            <button class="chip cg" onclick="addTo('cNotes','No severe events today')">No events</button>
+            <button class="chip cp" onclick="addTo('cNotes','All has been reset for our morning team! Goodnight everyone 💗')">Goodnight 💗</button>
+          </div>
+        </div>
+
+        <div class="sl">Infractions</div>
+        <div id="dInfrC"></div>
+        <button class="bd sm" style="margin-bottom:9px" onclick="addInfr('dInfrC','cInfr')">+ Add infraction</button>
+        <textarea id="cInfr" style="display:none"></textarea>
+
+        <div class="sl">Reset / handoff</div>
+        <textarea id="cReset"></textarea>
+      </div>
+
+      <!-- ── GEMBA ── -->
+      <div id="secG" class="hidden">
+        <div class="g4">
+          <div><label>Gemba time</label>
+            <select id="gTime"><option>3pm</option><option>5pm</option><option>7pm</option></select>
+          </div>
+          <div><label>Site</label><input id="gSite"></div>
+          <div><label>Title</label><input id="gTitle" value="Gemba Notes"></div>
+          <div><label>Intro</label><input id="gIntro" value="Please update us on the following:"></div>
+        </div>
+        <div class="sl">Pickup Fail / PuF</div>
+        <textarea id="gPuf"></textarea>
+        <div class="chips">
+          <button class="chip cg" onclick="setTo('gPuf','No elevated PuF issues reported at this time')">No issues</button>
+          <button class="chip cy" onclick="addTo('gPuf','PuF count is being monitored throughout the shift')">Monitoring</button>
+          <button class="chip cb" onclick="addTo('gPuf','Driver has been contacted')">Driver contacted</button>
+        </div>
+        <div class="sl">PNOV status</div>
+        <textarea id="gPnov"></textarea>
+        <div class="chips">
+          <button class="chip cg" onclick="setTo('gPnov','No elevated PNOV issues reported at this time')">No issues</button>
+          <button class="chip cy" onclick="addTo('gPnov','PNOV trend is being tracked and reviewed by dispatch')">Monitoring</button>
+          <button class="chip cb" onclick="addTo('gPnov','Impacted drivers contacted')">Drivers contacted</button>
+        </div>
+        <div class="sl">CRET / Whole Foods</div>
+        <textarea id="gCret"></textarea>
+        <div class="chips">
+          <button class="chip cg" onclick="setTo('gCret','CRET / Whole Foods pickup status confirmed. Volume collected and pictures submitted.')">Confirmed ✅</button>
+          <button class="chip cy" onclick="addTo('gCret','Awaiting volume confirmation and pictures from driver')">Awaiting pics</button>
+        </div>
+        <div class="sl">On-road risk</div>
+        <textarea id="gRisk"></textarea>
+        <div class="chips">
+          <button class="chip cg" onclick="setTo('gRisk','No major on-road risk identified at this time')">No risk</button>
+          <button class="chip cy" onclick="addTo('gRisk','Drivers behind are being monitored and support will be assigned if needed')">Monitoring behind</button>
+          <button class="chip cr" onclick="addTo('gRisk','Multiple routes behind — rescue being evaluated')">Rescue evaluating</button>
+        </div>
+        <div class="sl">Action plan</div>
+        <textarea id="gAction"></textarea>
+        <div class="chips">
+          <button class="chip cb" onclick="addTo('gAction','Dispatch will continue monitoring execution progress and follow up as needed.')">Continue monitoring</button>
+          <button class="chip cp" onclick="autoGemba()">✨ Auto generate</button>
+        </div>
+      </div>
+
+      <div class="abar">
+        <button class="bp" onclick="render()">⚡ Generate</button>
+        <button class="bs" onclick="doCopy()">📋 Copy for Telegram</button>
+        <button class="bd" onclick="sendTelegram()">📤 Open in Telegram</button>
+        <button class="bd" onclick="doSave()">💾 Save</button>
+        <button class="bd" onclick="doDupe()">📄 Duplicate last</button>
+        <button class="bd" onclick="doFixed()">🔄 Fill fixed fields</button>
+        <button class="bd" onclick="doTxt()">⬇ Download .txt</button>
+        <button class="bw" onclick="clearSec()">✕ Clear section</button>
+        <button class="bw" onclick="clearAll()">✕ Clear all</button>
+      </div>
+    </div>
+
+    <!-- PREVIEW -->
+    <div>
+      <div class="card" style="margin-bottom:11px">
+        <h2>Preview</h2>
+        <div class="kpis">
+          <div class="kpi"><div class="kn" id="k1">-</div><div class="kl" id="k1l">—</div></div>
+          <div class="kpi"><div class="kn" id="k2">-</div><div class="kl" id="k2l">—</div></div>
+          <div class="kpi"><div class="kn" id="k3">-</div><div class="kl" id="k3l">—</div></div>
+          <div class="kpi"><div class="kn" id="k4">-</div><div class="kl" id="k4l">—</div></div>
+        </div>
+        <textarea id="output" class="output"></textarea>
+        <div style="display:flex;justify-content:space-between;margin-top:5px">
+          <span id="cc" style="font-size:10px;color:var(--muted)">0 / 4096</span>
+          <span style="font-size:10px;color:var(--muted)">Labels editable in ⚙️ Settings</span>
+        </div>
+        <input type="checkbox" id="xSpacing" checked style="display:none">
+      </div>
+      <div class="card">
+        <h2>History</h2>
+        <div id="hist"><div style="font-size:11px;color:var(--muted)">No saved reports yet.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SETTINGS ═══ -->
+<div id="vSet" class="hidden">
+  <div class="card">
+    <h2>Settings — Labels &amp; Emojis</h2>
+    <div class="tabs">
+      <button class="tab on" id="stM" onclick="showST('ssM',this)">Morning</button>
+      <button class="tab" id="stP" onclick="showST('ssP',this)">Progress</button>
+      <button class="tab" id="stC" onclick="showST('ssC',this)">Closing</button>
+    </div>
+    <div id="ssM">
+      <div class="sgrid">
+        <div class="ssec"><h3>Header</h3>
+          <div class="g2">
+            <div><label>Title</label><input data-s="sMTitle"></div>
+            <div><label>Emoji</label><input data-s="sMEmoji"></div>
+          </div>
+        </div>
+        <div class="ssec"><h3>Equipment</h3>
+          <div class="g2">
+            <div><label>Phones</label><input data-s="sPhL"></div><div><label>Emoji</label><input data-s="sPhE"></div>
+            <div><label>Chargers</label><input data-s="sChL"></div><div><label>Emoji</label><input data-s="sChE"></div>
+            <div><label>Gas cards</label><input data-s="sGsL"></div><div><label>Emoji</label><input data-s="sGsE"></div>
+            <div><label>Routes</label><input data-s="sRtL"></div><div><label>Emoji</label><input data-s="sRtE"></div>
+          </div>
+        </div>
+        <div class="ssec"><h3>Execution &amp; sections</h3>
+          <div class="g2">
+            <div><label>Total packages</label><input data-s="sTpL"></div><div><label>Emoji</label><input data-s="sTpE"></div>
+            <div><label>Remaining</label><input data-s="sRemML"></div><div><label>Emoji</label><input data-s="sRemME"></div>
+            <div><label>Stop progress</label><input data-s="sStpML"></div><div><label>Emoji</label><input data-s="sStpME"></div>
+            <div><label>Package progress</label><input data-s="sPkgML"></div><div><label>Emoji</label><input data-s="sPkgME"></div>
+            <div><label>Attempt success</label><input data-s="sAttML"></div><div><label>Emoji</label><input data-s="sAttME"></div>
+            <div><label>Daily log</label><input data-s="sDlL"></div><div><label>Emoji</label><input data-s="sDlE"></div>
+            <div><label>GEOTAB</label><input data-s="sGeoL"></div><div><label>Emoji</label><input data-s="sGeoE"></div>
+            <div><label>Call outs</label><input data-s="sCoL"></div><div><label>Emoji</label><input data-s="sCoE"></div>
+            <div><label>Late</label><input data-s="sLateL"></div><div><label>Emoji</label><input data-s="sLateE"></div>
+            <div><label>Netradyne</label><input data-s="sNetL"></div><div><label>Emoji</label><input data-s="sNetE"></div>
+            <div><label>Load out</label><input data-s="sLoadL"></div><div><label>Emoji</label><input data-s="sLoadE"></div>
+            <div><label>Notes</label><input data-s="sNotesMl"></div><div><label>Emoji</label><input data-s="sNotesME"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="ssP" class="hidden">
+      <div class="ssec"><h3>Progress labels</h3>
+        <div class="g2">
+          <div><label>Title</label><input data-s="sPtitle"></div><div><label>Emoji</label><input data-s="sPemoji"></div>
+          <div><label>Remaining</label><input data-s="sRemL"></div><div><label>Emoji</label><input data-s="sRemE"></div>
+          <div><label>Stop progress</label><input data-s="sStpL"></div><div><label>Emoji</label><input data-s="sStpE"></div>
+          <div><label>Package progress</label><input data-s="sPkgL"></div><div><label>Emoji</label><input data-s="sPkgE"></div>
+          <div><label>Attempt success</label><input data-s="sAttL"></div><div><label>Emoji</label><input data-s="sAttE"></div>
+          <div><label>Locations</label><input data-s="sLocL"></div><div><label>Emoji</label><input data-s="sLocE"></div>
+          <div><label>Package status</label><input data-s="sPkgSL"></div><div><label>Emoji</label><input data-s="sPkgSE"></div>
+          <div><label>Infractions</label><input data-s="sInfrL"></div><div><label>Emoji</label><input data-s="sInfrE"></div>
+          <div><label>Risk level</label><input data-s="sRiskL"></div><div><label>Emoji</label><input data-s="sRiskE"></div>
+          <div><label>Rescue plan</label><input data-s="sRescL"></div><div><label>Emoji</label><input data-s="sRescE"></div>
+          <div><label>Behind</label><input data-s="sBehL"></div><div><label>Emoji</label><input data-s="sBehE"></div>
+          <div><label>At risk</label><input data-s="sArL"></div><div><label>Emoji</label><input data-s="sArE"></div>
+        </div>
+      </div>
+    </div>
+    <div id="ssC" class="hidden">
+      <div class="ssec"><h3>Closing labels</h3>
+        <div class="g2">
+          <div><label>Title</label><input data-s="sCtitle"></div><div><label>Emoji</label><input data-s="sCemoji"></div>
+          <div><label>Phones label</label><input data-s="sCPhL"></div>
+          <div><label>Chargers label</label><input data-s="sCChL"></div>
+        </div>
+      </div>
+    </div>
+    <div class="abar">
+      <button class="bp" onclick="showView('main')">← Back</button>
+      <button class="bd" onclick="resetCfg()">Reset defaults</button>
+      <button class="bw" onclick="hardReset()">🗑️ Clear all saved data</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- hidden cfg storage -->
+<div style="display:none">
+  <input id="sMTitle" value="Morning Report"><input id="sMEmoji" value="☀️">
+  <input id="sPhL" value="Phones"><input id="sPhE" value="📱">
+  <input id="sChL" value="Chargers"><input id="sChE" value="🔌">
+  <input id="sGsL" value="Gas cards"><input id="sGsE" value="⛽">
+  <input id="sRtL" value="Routes"><input id="sRtE" value="🛣️">
+  <input id="sTpL" value="Total packages today"><input id="sTpE" value="📦">
+  <input id="sRemML" value="Remaining packages"><input id="sRemME" value="❗">
+  <input id="sStpML" value="Stop progress"><input id="sStpME" value="🔴">
+  <input id="sPkgML" value="Package progress"><input id="sPkgME" value="📬">
+  <input id="sAttML" value="Attempt success"><input id="sAttME" value="✅">
+  <input id="sDlL" value="Daily Log and LMD Max"><input id="sDlE" value="🗂️">
+  <input id="sGeoL" value="GEOTAB"><input id="sGeoE" value="🛰️">
+  <input id="sCoL" value="Call outs"><input id="sCoE" value="📞">
+  <input id="sLateL" value="Late"><input id="sLateE" value="⏰">
+  <input id="sNetL" value="Netradyne"><input id="sNetE" value="🎥">
+  <input id="sLoadL" value="Load out"><input id="sLoadE" value="🚚">
+  <input id="sNotesMl" value="Notes"><input id="sNotesME" value="📝">
+  <input id="sPtitle" value="Report"><input id="sPemoji" value="⏰">
+  <input id="sRemL" value="Remaining packages"><input id="sRemE" value="📦">
+  <input id="sStpL" value="Stop progress"><input id="sStpE" value="🔴">
+  <input id="sPkgL" value="Package progress"><input id="sPkgE" value="📬">
+  <input id="sAttL" value="Attempt success"><input id="sAttE" value="✅">
+  <input id="sLocL" value="Locations progress"><input id="sLocE" value="📍">
+  <input id="sPkgSL" value="Package status"><input id="sPkgSE" value="📌">
+  <input id="sInfrL" value="Infractions"><input id="sInfrE" value="🚨">
+  <input id="sRiskL" value="Risk level"><input id="sRiskE" value="⚠️">
+  <input id="sRescL" value="Rescue plan / sweepers"><input id="sRescE" value="🚚">
+  <input id="sBehL" value="Behind"><input id="sBehE" value="🔴">
+  <input id="sArL" value="At risk"><input id="sArE" value="🟡">
+  <input id="sCtitle" value="Closing reports"><input id="sCemoji" value="🌙">
+  <input id="sCPhL" value="📱 Phones"><input id="sCChL" value="🔋 Chargers">
+</div>
+
+<script>
+(function () {
+'use strict';
+
+/* ── constants ─────────────────────────────────────────── */
+var LSKEY  = 'rg2_form';
+var LSHIST = 'rg2_hist';
+var INFR_TYPES = [
+  '', 'Speeding', 'Hard braking', 'Hard acceleration',
+  'Stop sign violation', 'Traffic light violation', 'Distracted driving',
+  'Seatbelt violation', 'Phone use while driving', 'Following distance',
+  'Illegal U-turn', 'Backing incident', 'Harsh turn / cornering',
+  'Drowsiness alert', 'Lane departure', 'Near collision'
+];
+var RREA_CHIPS = [
+  ['Access problem — no entry','🔒 Access'],
+  ['Business closed at time of delivery','🏢 Closed'],
+  ['OTP not received by customer','📲 OTP'],
+  ['Customer not home — no response','🏠 Not home'],
+  ['Gate/code issue — no entry','🚪 Gate'],
+  ['Dog or safety concern','🐕 Dog'],
+  ['Wrong address — cannot locate','📍 Wrong addr']
+];
+var RMIS_CHIPS = [
+  ['Not found in vehicle','🔍 Not in van'],
+  ['Possible misload — wrong route','📦 Misload'],
+  ['Delivered — no scan recorded','✅ No scan'],
+  ['Left behind at station','🏭 Left at stn'],
+  ['Under investigation','🔎 Review']
+];
+
+var currentTab = 'M';
+
+/* ── tiny DOM helpers ──────────────────────────────────── */
+function $  (id) { return document.getElementById(id); }
+function val(id) {
+  if (id === 'station') {
+    var s = $('xStnSel');
+    if (s && s.value && s.value !== '__o') return s.value.trim();
+    var t = $('xStnTxt');
+    return t ? t.value.trim() : '';
+  }
+  var e = $(id);
+  return e ? e.value.trim() : '';
+}
+function C(id) { return val(id); } /* alias for cfg */
+
+/* ── text helpers ──────────────────────────────────────── */
+function fmtDate(d) {
+  if (!d) return '';
+  var p = d.split('-');
+  return p[1] + '/' + p[2] + '/' + p[0];
+}
+function fl(emoji, label, v, suf) {
+  if (!v) return '';
+  suf = suf || '';
+  var pre = (emoji ? emoji + ' ' : '') + (label || '');
+  return pre.trim() ? pre.trim() + ': ' + v + suf : v + suf;
+}
+function listify(t) {
+  if (!t || !t.trim()) return '';
+  return t.split(/\n+/)
+    .map(function(x){ return x.trim(); })
+    .filter(Boolean)
+    .map(function(x){ return '• ' + x; })
+    .join('\n');
+}
+function plain(t) {
+  if (!t || !t.trim()) return '';
+  return t.split(/\n+/)
+    .map(function(x){ return x.trim(); })
+    .filter(Boolean)
+    .join('\n');
+}
+function esc(s) {
+  return (s || '').replace(/[&<>"']/g, function(m) {
+    return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m];
+  });
+}
+function toast(msg) {
+  var e = $('toast');
+  e.textContent = msg;
+  e.className = 'toast on';
+  setTimeout(function(){ e.className = 'toast'; }, 3000);
+}
+
+/* ── view / tab switching ──────────────────────────────── */
+function showView(v) {
+  $('vMain').classList.toggle('hidden', v !== 'main');
+  $('vSet').classList.toggle('hidden',  v !== 'settings');
+  $('nbMain').className = v === 'main'     ? 'ba' : 'bg';
+  $('nbSet').className  = v === 'settings' ? 'ba' : 'bg';
+}
+
+function setTab(t) {
+  currentTab = t;
+  ['M','P','C','G'].forEach(function(x) {
+    $('sec' + x).classList.toggle('hidden', x !== t);
+    $('t'  + x).classList.toggle('on',      x === t);
+  });
+  var titles = { M:'Morning Report', P:'Progress Report', C:'Closing Report', G:'Gemba Notes' };
+  $('ftitle').textContent = titles[t];
+  $('xTimeWrap').classList.toggle('hidden', t === 'M' || t === 'G');
+  render();
+}
+
+function showST(id, btn) {
+  ['ssM','ssP','ssC'].forEach(function(x){ $(x).classList.toggle('hidden', x !== id); });
+  document.querySelectorAll('.tabs .tab').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+}
+
+function onStn(v) {
+  $('xStnTxt').style.display = v === '__o' ? 'block' : 'none';
+  if (v !== '__o') $('xStnTxt').value = '';
+  save(); render();
+}
+
+/* ── chip helpers ──────────────────────────────────────── */
+function addTo(id, text) {
+  var e = $(id);
+  if (!e) return;
+  e.value = (e.value.trim() ? e.value.trim() + '\n' : '') + text;
+  save(); render();
+}
+function setTo(id, text) {
+  var e = $(id);
+  if (!e) return;
+  e.value = text;
+  save(); render();
+}
+
+/* ── name rows (team / geotab) ─────────────────────────── */
+function addName(cid, tid, saved) {
+  saved = saved || {};
+  var c = $(cid);
+  var row = document.createElement('div');
+  row.className = 'nrow';
+  var inp = document.createElement('input');
+  inp.value = saved.n || '';
+  var btn = document.createElement('button');
+  btn.className = 'bw sm';
+  btn.textContent = '✕';
+  inp.addEventListener('input', function(){ syncNames(cid, tid); });
+  btn.addEventListener('click', function(){ row.remove(); syncNames(cid, tid); });
+  row.appendChild(inp);
+  row.appendChild(btn);
+  c.appendChild(row);
+  if (saved.n) syncNames(cid, tid);
+}
+function syncNames(cid, tid) {
+  var lines = [];
+  $(cid).querySelectorAll('input').forEach(function(i){
+    if (i.value.trim()) lines.push(i.value.trim());
+  });
+  $(tid).value = lines.join('\n');
+  save(); render();
+}
+function getNameData(cid) {
+  var rows = [];
+  $(cid).querySelectorAll('input').forEach(function(i){ rows.push({ n: i.value }); });
+  return rows;
+}
+
+/* ── call-out rows ─────────────────────────────────────── */
+var CO_R = ['','Sick','Personal','No call','Family emergency','Late','Other'];
+function addCallOut(saved) {
+  saved = saved || {};
+  var c = $('dCo');
+  var row = document.createElement('div');
+  row.className = 'corow';
+  var inp = document.createElement('input');
+  inp.value = saved.n || '';
+  var sel = document.createElement('select');
+  sel.className = '';
+  CO_R.forEach(function(r) {
+    var o = document.createElement('option');
+    o.value = r; o.textContent = r || '— Reason —';
+    if (r === saved.r) o.selected = true;
+    sel.appendChild(o);
+  });
+  var btn = document.createElement('button');
+  btn.className = 'bw sm'; btn.textContent = '✕';
+  function sync() { syncCo(); }
+  inp.addEventListener('input', sync);
+  sel.addEventListener('change', sync);
+  btn.addEventListener('click', function(){ row.remove(); syncCo(); });
+  row.appendChild(inp); row.appendChild(sel); row.appendChild(btn);
+  c.appendChild(row);
+}
+function syncCo() {
+  var lines = [];
+  $('dCo').querySelectorAll('div.corow').forEach(function(row) {
+    var n = (row.querySelector('input') || {}).value || '';
+    var r = (row.querySelector('select') || {}).value || '';
+    n = n.trim();
+    if (n) lines.push(r ? n + ' - ' + r : n);
+  });
+  $('mCo').value = lines.join('\n');
+  save(); render();
+}
+function getCoData() {
+  var rows = [];
+  $('dCo').querySelectorAll('div.corow').forEach(function(row) {
+    rows.push({
+      n: (row.querySelector('input')  || {}).value || '',
+      r: (row.querySelector('select') || {}).value || ''
+    });
+  });
+  return rows;
+}
+
+/* ── repeat rows (reattempt / missing) ─────────────────── */
+function addRow(cid, type, saved) {
+  saved = saved || {};
+  var c = $(cid);
+  var idx = c.querySelectorAll('.rrow').length;
+  var isM = type === 'M';
+  var row = document.createElement('div');
+  row.className = 'rrow';
+
+  /* header */
+  var head = document.createElement('div');
+  head.className = 'rrow-h';
+  var sp = document.createElement('span');
+  sp.textContent = (isM ? 'Missing' : 'Reattemptable') + ' #' + (idx + 1);
+  var xb = document.createElement('button');
+  xb.className = 'bw sm'; xb.textContent = '✕';
+  xb.addEventListener('click', function(){ row.remove(); save(); render(); });
+  head.appendChild(sp); head.appendChild(xb);
+  row.appendChild(head);
+
+  /* grid: Name | Detail | TBA (missing flips TBA and Detail) */
+  var grid = document.createElement('div');
+  grid.className = 'g3';
+  var fields = [
+    ['name',   'Name / DA'],
+    [isM ? 'tba'    : 'detail', isM ? 'TBA #'          : 'Reason / detail'],
+    [isM ? 'detail' : 'tba',   isM ? 'Reason / detail' : 'TBA #']
+  ];
+  fields.forEach(function(f) {
+    var d = document.createElement('div');
+    var lb = document.createElement('label');
+    lb.textContent = f[1];
+    var inp = document.createElement('input');
+    inp.dataset.f = f[0];
+    inp.value = saved[f[0]] || '';
+    inp.addEventListener('input', function(){ save(); render(); });
+    d.appendChild(lb); d.appendChild(inp);
+    grid.appendChild(d);
+  });
+  row.appendChild(grid);
+
+  /* reason chips */
+  var chips = isM ? RMIS_CHIPS : RREA_CHIPS;
+  var rc = document.createElement('div');
+  rc.className = 'rchips';
+  var rt = document.createElement('div');
+  rt.className = 'rchips-t'; rt.textContent = 'Reason';
+  rc.appendChild(rt);
+  var cf = document.createElement('div');
+  cf.className = 'chips';
+  chips.forEach(function(ch) {
+    var btn = document.createElement('button');
+    btn.className = 'chip cr';
+    btn.textContent = ch[1];
+    btn.addEventListener('click', function() {
+      var inp = row.querySelector('[data-f="detail"]');
+      if (inp) { inp.value = ch[0]; save(); render(); }
+    });
+    cf.appendChild(btn);
+  });
+  rc.appendChild(cf);
+  row.appendChild(rc);
+  c.appendChild(row);
+}
+function qRow(cid, type, detail) {
+  addRow(cid, type, { detail: detail });
+  save(); render();
+}
+function collectRowText(cid) {
+  var lines = [];
+  $(cid).querySelectorAll('.rrow').forEach(function(row) {
+    var n = ((row.querySelector('[data-f="name"]')   || {}).value || '').trim();
+    var d = ((row.querySelector('[data-f="detail"]') || {}).value || '').trim();
+    var t = ((row.querySelector('[data-f="tba"]')    || {}).value || '').trim();
+    if (n || d || t) {
+      var parts = [];
+      if (n) parts.push(n);
+      if (d) parts.push(d);
+      var line = parts.join(' - ');
+      if (t) line += ' | TBA' + t;
+      lines.push(line);
+    }
+  });
+  return lines.join('\n');
+}
+function getRowData(cid) {
+  var rows = [];
+  $(cid).querySelectorAll('.rrow').forEach(function(row) {
+    rows.push({
+      name:   (row.querySelector('[data-f="name"]')   || {}).value || '',
+      detail: (row.querySelector('[data-f="detail"]') || {}).value || '',
+      tba:    (row.querySelector('[data-f="tba"]')    || {}).value || ''
+    });
+  });
+  return rows;
+}
+
+/* ── access problem rows ───────────────────────────────── */
+var ACC_TYPES = [
+  '', 'Gate code not working', 'No gate code on file', 'Call box not working',
+  'Key fob required — no access', 'Locked building — no entry',
+  'Elevator out of service', 'Restricted / no-access zone',
+  'Dog or animal on property', 'Gated community — waiting on resident',
+  'Front desk closed', 'Parking not accessible', 'Road blocked or closed'
+];
+function addAcc(saved) {
+  saved = saved || {};
+  var c = $('dAcc');
+  var row = document.createElement('div');
+  row.className = 'irow';
+  var sel = document.createElement('select');
+  var inp = document.createElement('input');
+  inp.placeholder = 'Driver / DA';
+  var btn = document.createElement('button');
+  btn.className = 'bw sm'; btn.textContent = '✕';
+  ACC_TYPES.forEach(function(t) {
+    var o = document.createElement('option');
+    o.value = t; o.textContent = t || '— Select access issue —';
+    if (t === saved.type) o.selected = true;
+    sel.appendChild(o);
+  });
+  inp.value = saved.name || '';
+  function sync() { syncAcc(); }
+  sel.addEventListener('change', sync);
+  inp.addEventListener('input', sync);
+  btn.addEventListener('click', function(){ row.remove(); syncAcc(); });
+  row.appendChild(sel); row.appendChild(inp); row.appendChild(btn);
+  c.appendChild(row);
+  if (saved.type) syncAcc();
+}
+function syncAcc() {
+  var lines = [];
+  $('dAcc').querySelectorAll('.irow').forEach(function(row) {
+    var t = (row.querySelector('select') || {}).value || '';
+    var n = ((row.querySelector('input') || {}).value || '').trim();
+    if (t) lines.push(n ? n + ' - ' + t : t);
+  });
+  $('pAcc').value = lines.join('\n');
+  save(); render();
+}
+function getAccData() {
+  var rows = [];
+  $('dAcc').querySelectorAll('.irow').forEach(function(row) {
+    rows.push({
+      type: (row.querySelector('select') || {}).value || '',
+      name: (row.querySelector('input')  || {}).value || ''
+    });
+  });
+  return rows;
+}
+
+/* ── infraction rows ───────────────────────────────────── */
+function addInfr(cid, tid, saved) {
+  saved = saved || {};
+  var c = $(cid);
+  var row = document.createElement('div');
+  row.className = 'irow';
+  var sel = document.createElement('select');
+  var inp = document.createElement('input');
+  inp.placeholder = 'Driver name';
+  var btn = document.createElement('button');
+  btn.className = 'bw sm'; btn.textContent = '✕';
+  INFR_TYPES.forEach(function(t) {
+    var o = document.createElement('option');
+    o.value = t; o.textContent = t || '— Select infraction —';
+    if (t === saved.type) o.selected = true;
+    sel.appendChild(o);
+  });
+  inp.value = saved.name || '';
+  function sync() { syncInfr(cid, tid); }
+  sel.addEventListener('change', sync);
+  inp.addEventListener('input', sync);
+  btn.addEventListener('click', function(){ row.remove(); syncInfr(cid, tid); });
+  row.appendChild(sel); row.appendChild(inp); row.appendChild(btn);
+  c.appendChild(row);
+  if (saved.type) syncInfr(cid, tid);
+}
+function syncInfr(cid, tid) {
+  var lines = [];
+  $(cid).querySelectorAll('.irow').forEach(function(row) {
+    var t = (row.querySelector('select') || {}).value || '';
+    var n = ((row.querySelector('input') || {}).value || '').trim();
+    if (t) lines.push(n ? n + ' - ' + t : t);
+  });
+  $(tid).value = lines.join('\n');
+  save(); render();
+}
+function getInfrData(cid) {
+  var rows = [];
+  $(cid).querySelectorAll('.irow').forEach(function(row) {
+    rows.push({
+      type: (row.querySelector('select') || {}).value || '',
+      name: (row.querySelector('input')  || {}).value || ''
+    });
+  });
+  return rows;
+}
+
+/* ── generators ────────────────────────────────────────── */
+function genM() {
+  var parts = [];
+  var d = val('xDate') ? ' - ' + fmtDate(val('xDate')) : '';
+  var hdr = C('sMEmoji') + ' ' + C('sMTitle') + d;
+  if (val('station')) hdr += '\n' + val('station');
+  parts.push(hdr.trim());
+
+  var team = val('mTeam');
+  if (team) {
+    var names = team.split('\n').filter(Boolean);
+    if (names.length) parts.push('👥 Opening team\n' + names.map(function(x){ return '• ' + x; }).join('\n'));
+  }
+
+  var eq = [];
+  if (val('mPh'))  eq.push(fl(C('sPhE'), C('sPhL'), val('mPh')));
+  if (val('mCh'))  eq.push(fl(C('sChE'), C('sChL'), val('mCh')));
+  if (val('mGs'))  eq.push(fl(C('sGsE'), C('sGsL'), val('mGs')));
+  if (val('mRt'))  eq.push(fl(C('sRtE'), C('sRtL'), val('mRt')));
+  if (eq.length) parts.push(eq.join('\n'));
+
+  var ex = [];
+  if (val('mTp'))  ex.push(fl(C('sTpE'),    C('sTpL'),    val('mTp')));
+  if (val('mRem')) ex.push(fl(C('sRemME'),  C('sRemML'),  val('mRem')));
+  if (val('mStp')) ex.push(fl(C('sStpME'),  C('sStpML'),  val('mStp'),  '%'));
+  if (val('mPkg')) ex.push(fl(C('sPkgME'),  C('sPkgML'),  val('mPkg'),  '%'));
+  if (val('mAtt')) ex.push(fl(C('sAttME'),  C('sAttML'),  val('mAtt'),  '%'));
+  if (val('mLoc')) ex.push(fl('📍', 'Locations progress', val('mLoc'), '%'));
+  if (ex.length) parts.push(ex.join('\n'));
+
+  var dl = [];
+  if (val('mDl'))  dl.push('Daily Log: ' + val('mDl'));
+  if (val('mLmd')) dl.push('LMD Max: '   + val('mLmd'));
+  if (dl.length) parts.push((C('sDlE') + ' ' + C('sDlL')).trim() + '\n' + dl.join('\n'));
+
+  function sec(title, body) { if (body && body.trim()) parts.push(title + '\n' + body); }
+  sec((C('sGeoE')    + ' ' + C('sGeoL')).trim(),    listify(val('mGeo')));
+  sec((C('sCoE')     + ' ' + C('sCoL')).trim(),     listify(val('mCo')));
+  if (val('mNcns'))  sec('🚫 No Call / No Show',     listify(val('mNcns')));
+  sec((C('sLateE')   + ' ' + C('sLateL')).trim(),   listify(val('mLate')));
+  sec((C('sNetE')    + ' ' + C('sNetL')).trim(),     listify(val('mNet')));
+  sec((C('sLoadE')   + ' ' + C('sLoadL')).trim(),    plain(val('mLoad')));
+  sec((C('sNotesME') + ' ' + C('sNotesMl')).trim(), plain(val('mNotes')));
+
+  return parts.join('\n\n');
+}
+
+function genP() {
+  var parts = [];
+  var d = val('xDate') ? ' - ' + fmtDate(val('xDate')) : '';
+  var hdr = (C('sPemoji') + ' ' + val('xTime') + ' ' + C('sPtitle') + d).trim();
+  if (val('station')) hdr += '\n' + val('station');
+  parts.push(hdr);
+
+  var ex = [];
+  if (val('pRem')) ex.push(fl(C('sRemE'), C('sRemL'), val('pRem')));
+  if (val('pStp')) ex.push(fl(C('sStpE'), C('sStpL'), val('pStp'), '%'));
+  if (val('pPkg')) ex.push(fl(C('sPkgE'), C('sPkgL'), val('pPkg'), '%'));
+  if (val('pAtt')) ex.push(fl(C('sAttE'), C('sAttL'), val('pAtt'), '%'));
+  if (val('pLoc')) ex.push(fl(C('sLocE'), C('sLocL'), val('pLoc'), '%'));
+  if (val('pRt'))  ex.push(fl('🛣️', 'Routes', val('pRt')));
+  if (ex.length) parts.push(ex.join('\n'));
+
+  var pk = [];
+  if (val('pRea')) pk.push('Reattemptable: ' + val('pRea'));
+  if (val('pUnd')) pk.push('Undeliverable: '  + val('pUnd'));
+  if (val('pMis')) pk.push('Missing: '        + val('pMis'));
+  if (val('pRet')) pk.push('Returned to station: ' + val('pRet'));
+  if (val('pPuf')) pk.push('Pickup failed: '  + val('pPuf'));
+  if (pk.length) parts.push((C('sPkgSE') + ' ' + C('sPkgSL')).trim() + '\n' + pk.join('\n'));
+
+  var rd = collectRowText('dRea');
+  if (rd) parts.push(rd);
+  var md = collectRowText('dMis');
+  if (md) parts.push(md);
+
+  var id = val('pInfD');
+  var ic = val('pInfN');
+  if (id) {
+    parts.push((C('sInfrE') + ' ' + C('sInfrL')).trim() + '\n' + listify(id));
+  } else if (ic && ic !== '0') {
+    parts.push((C('sInfrE') + ' ' + C('sInfrL')).trim() + '\n' + ic + ' event' + (Number(ic) > 1 ? 's' : '') + ' recorded');
+  }
+
+  var rk = [];
+  if (val('pAhd')) rk.push('Ahead: '   + val('pAhd'));
+  if (val('pAR'))  rk.push('At risk: ' + val('pAR'));
+  if (val('pBeh')) rk.push('Behind: '  + val('pBeh'));
+  if (rk.length) parts.push((C('sRiskE') + ' ' + C('sRiskL')).trim() + '\n' + rk.join('\n'));
+
+  function sec(title, body) { if (body && body.trim()) parts.push(title + '\n' + body); }
+  sec((C('sRescE') + ' ' + C('sRescL')).trim(), listify(val('pResc')));
+  sec((C('sBehE')  + ' ' + C('sBehL')).trim(),  listify(val('pBehN')));
+  sec((C('sArE')   + ' ' + C('sArL')).trim(),   listify(val('pARN')));
+  if (val('pAcc'))   sec('🔒 Access problems', listify(val('pAcc')));
+  if (val('pNotes')) sec('📝 Notes', plain(val('pNotes')));
+  return parts.join('\n\n');
+}
+
+function genC() {
+  var parts = [];
+  var d = val('xDate') ? ' - ' + fmtDate(val('xDate')) : '';
+  var hdr = (C('sCemoji') + ' ' + C('sCtitle') + d).trim();
+  if (val('station')) hdr += '\n' + val('station');
+  parts.push(hdr);
+
+  function sec(title, body) { if (body && body.trim()) parts.push(title + '\n' + body); }
+  if (val('cPrePost')) sec('🔍 Pre/Post inspections', plain(val('cPrePost')));
+  var rts = [];
+  if (val('cRtsSum'))  rts.push(plain(val('cRtsSum')));
+  if (val('cRtsRet'))  rts.push('RTS returned: ' + val('cRtsRet'));
+  if (val('cRtsGoal')) rts.push('Goal: ' + val('cRtsGoal'));
+  if (rts.length) parts.push('📦 RTS\n' + rts.join('\n'));
+  if (val('cEvents')) sec('📅 Events', plain(val('cEvents')));
+  var cage = [];
+  if (val('cCage')) cage.push(plain(val('cCage')));
+  if (val('cPh'))   cage.push(C('sCPhL') + ': ' + val('cPh'));
+  if (val('cCh'))   cage.push(C('sCChL') + ': ' + val('cCh'));
+  if (cage.length) parts.push('📱 Cage / devices\n' + cage.join('\n'));
+  if (val('cTasks')) sec('✅ Completed tasks', plain(val('cTasks')));
+  if (val('cPick'))  sec('🏪 Pickups', plain(val('cPick')));
+  if (val('cNotes')) sec('📝 Notes', plain(val('cNotes')));
+  if (val('cInfr'))  sec('🚨 Infractions', listify(val('cInfr')));
+  if (val('cReset')) sec('🔄 Reset / handoff', plain(val('cReset')));
+  return parts.join('\n\n');
+}
+
+function genG() {
+  var parts = [];
+  var t  = val('gTime') || '';
+  var s  = val('gSite') || '';
+  var ti = val('gTitle') || 'Gemba Notes';
+  parts.push((t + ' ' + ti + (s ? ' - ' + s : '')).trim());
+  if (val('gIntro')) parts.push(val('gIntro'));
+  function sec(title, body) { if (body && body.trim()) parts.push(title + '\n' + body); }
+  sec('• Pickup Fail status',        plain(val('gPuf')));
+  sec('• PNOV status',               plain(val('gPnov')));
+  sec('• CRET / Whole Foods status', plain(val('gCret')));
+  sec('• On-road risk',              plain(val('gRisk')));
+  sec('• Action plan',               plain(val('gAction')));
+  return parts.join('\n\n');
+}
+
+/* U+2800 BRAILLE PATTERN BLANK — renders as nothing but is not
+   whitespace, so Telegram will not collapse the line on paste. */
+var BLANK = '\u2800';
+
+function applySpacingFix(text) {
+  var box = $('xSpacing');
+  if (!box || !box.checked) return text;
+  return text.replace(/\n\n/g, '\n' + BLANK + '\n');
+}
+
+function render() {
+  var fns = { M: genM, P: genP, C: genC, G: genG };
+  var text = applySpacingFix((fns[currentTab] || genM)());
+  $('output').value = text;
+  updateKpis();
+  updateCount();
+  updateIndicators();
+}
+
+/* ── KPIs ──────────────────────────────────────────────── */
+function updateKpis() {
+  var sets = {
+    M: [['mTp','Total Pkg'],['mRem','Remaining'],['mStp','Stop %'],['mAtt','Attempt %']],
+    P: [['pRem','Remaining'],['pRea','Reattempt'],['pMis','Missing'],['pInfN','Infractions']],
+    C: [['cRtsRet','RTS ret'],['cRtsGoal','Goal'],['cPh','Phones'],['cCh','Chargers']],
+    G: [['gPuf','PuF','i'],['gPnov','PNOV','i'],['gCret','CRET','i'],['gRisk','Risk','i']]
+  };
+  (sets[currentTab] || sets.M).forEach(function(row, i) {
+    var v = val(row[0]);
+    var isI = row[2] === 'i';
+    $('k' + (i+1)).textContent       = isI ? (v ? '✓' : '-') : (v || '-');
+    $('k' + (i+1) + 'l').textContent = row[1];
+    $('k' + (i+1)).style.color       = isI ? (v ? 'var(--green)' : 'var(--dim)') : 'var(--navy)';
+  });
+}
+
+function updateCount() {
+  var n = $('output').value.length;
+  $('cc').textContent = n + ' / 4096';
+  $('cc').style.color = n > 4096 ? 'var(--red)' : n > 3500 ? 'var(--amber)' : 'var(--muted)';
+}
+
+function updateIndicators() {
+  if (currentTab !== 'M') return;
+  [
+    ['slEquip', val('mPh') && val('mCh') && val('mRt')],
+    ['slExec',  val('mTp') && val('mAtt')],
+    ['slDl',    val('mDl') && val('mLmd')],
+    ['slGeo',   val('mGeo')],
+    ['slCo',    val('mCo')],
+    ['slNotes', val('mNotes')]
+  ].forEach(function(c) {
+    var e = $(c[0]);
+    if (e) e.classList.toggle('ok', !!c[1]);
+  });
+}
+
+/* ── auto notes ────────────────────────────────────────── */
+function autoMorning() {
+  var n = ['Morning operation is being reviewed and prepared for dispatch execution.'];
+  if (val('mPh'))  n.push('Device readiness reviewed: ' + val('mPh') + ' phones accounted for.');
+  if (val('mRt'))  n.push(val('mRt') + ' routes prepared for dispatch.');
+  if (val('mTp'))  n.push('Total package volume for the day is ' + val('mTp') + '.');
+  n.push('Dispatch will continue monitoring driver readiness and route departure status.');
+  setTo('mNotes', n.join('\n'));
+}
+function autoProgress() {
+  var m = Number(val('pMis') || 0), b = Number(val('pBeh') || 0), a = Number(val('pAtt') || 0);
+  var n;
+  if (a >= 98 && m <= 3 && b === 0)
+    n = 'Operation remains stable with no significant risks. Dispatch will continue monitoring execution.';
+  else if (m > 0 || b > 0)
+    n = 'Minor performance deviations identified. Dispatch is monitoring closely and providing support where needed.';
+  else
+    n = 'Operational performance under continuous review. No major risks identified at this time.';
+  setTo('pNotes', n);
+}
+function autoGemba() {
+  var n = ['Dispatch will continue monitoring execution progress and follow up as needed.'];
+  if (val('gPuf'))  n.unshift('Pickup Fail status reviewed.');
+  if (val('gPnov')) n.unshift('PNOV reviewed and drivers followed up.');
+  if (val('gCret')) n.unshift('CRET / Whole Foods confirmed and tracked.');
+  setTo('gAction', n.join('\n'));
+}
+
+/* ── copy / save / download ────────────────────────────── */
+function validate() {
+  if (currentTab === 'M') {
+    var miss = [];
+    if (!val('mPh'))  miss.push('Phones');
+    if (!val('mRt'))  miss.push('Routes');
+    if (!val('mTp'))  miss.push('Total packages');
+    if (miss.length) { toast('⚠️ Missing: ' + miss.join(', ')); return false; }
+  }
+  if (currentTab === 'P') {
+    if (!val('pRem') && !val('pStp') && !val('pPkg')) {
+      toast('⚠️ Fill at least one execution number'); return false;
+    }
+  }
+  return true;
+}
+
+function sendTelegram() {
+  if (!validate()) return;
+  if (!$('output').value.trim()) render();
+  var text = $('output').value.replace(/\r\n/g, '\n');
+  /* Telegram share link: text is URL-encoded so blank lines survive exactly.
+     This bypasses the clipboard entirely. */
+  var url = 'https://t.me/share/url?url=&text=' + encodeURIComponent(text);
+  window.open(url, '_blank');
+}
+
+function doCopy() {
+  if (!validate()) return;
+  if (!$('output').value.trim()) render();
+  var text = $('output').value.replace(/\r\n/g, '\n');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(function(){ toast('✅ Copied!'); })
+      .catch(function(){ fallbackCopy(text); });
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  /* Use a dedicated off-screen textarea — copying from the visible one
+     can let the browser normalise whitespace on some mobile clients. */
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly', '');
+  ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:none;opacity:0;white-space:pre';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  ta.setSelectionRange(0, text.length);
+  var okCopy = false;
+  try { okCopy = document.execCommand('copy'); } catch (e) { okCopy = false; }
+  document.body.removeChild(ta);
+  toast(okCopy ? '✅ Copied!' : 'Copy failed — use Send to Telegram.');
+}
+
+function doSave() {
+  if (!$('output').value.trim()) render();
+  var lbls = { M:'Morning', P: val('xTime') || 'Progress', C:'Closing', G:'Gemba' };
+  var item = { tab: currentTab, label: lbls[currentTab], time: new Date().toLocaleString(), text: $('output').value, form: gather() };
+  var h = readHist();
+  h.unshift(item);
+  writeHist(h.slice(0, 25));
+  renderHist();
+  toast('💾 Saved!');
+}
+
+function doTxt() {
+  if (!$('output').value.trim()) render();
+  var text = $('output').value;
+  var name = currentTab + '_report.txt';
+  var a = document.createElement('a');
+  a.download = name;
+  try {
+    var url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
+    a.href = url;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    /* fallback: data URI (works everywhere) */
+    a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
+    a.click();
+  }
+}
+
+function doDupe() {
+  var h = readHist();
+  if (!h.length) { toast('No saved reports.'); return; }
+  var last = h[0];
+  if (last.form) restore(last.form);
+  var d = new Date();
+  $('xDate').value = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  setTab(last.tab || 'M');
+  toast('📄 Duplicated — date set to today.');
+}
+
+function doFixed() {
+  var h = readHist();
+  if (!h.length || !h[0].form) { toast('No saved report found.'); return; }
+  var f = h[0].form;
+  ['mPh','mCh','mGs','mRt'].forEach(function(id){ var e=$(id); if(e&&f[id]!==undefined) e.value=f[id]; });
+  if (f.xStnSel) { $('xStnSel').value = f.xStnSel; onStn(f.xStnSel); if (f.xStnTxt) $('xStnTxt').value = f.xStnTxt; }
+  var d = new Date();
+  $('xDate').value = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  save(); render();
+  toast('✅ Fixed fields loaded.');
+}
+
+function pad(n) { return String(n).padStart(2,'0'); }
+
+/* ── history ───────────────────────────────────────────── */
+function readHist() {
+  try { return JSON.parse(localStorage.getItem(LSHIST) || '[]') || []; }
+  catch (e) { return []; }
+}
+function writeHist(h) {
+  try { localStorage.setItem(LSHIST, JSON.stringify(h)); } catch (e) {}
+}
+function renderHist() {
+  var h = readHist();
+  var box = $('hist');
+  if (!h.length) { box.innerHTML = '<div style="font-size:11px;color:var(--muted)">No saved reports yet.</div>'; return; }
+  box.innerHTML = h.map(function(item, i) {
+    return '<div class="hi"><div class="hi-h"><span class="hi-lb">' + esc(item.label) + '</span><span class="hi-t">' + esc(item.time) + '</span></div>' +
+      '<div class="hi-tx">' + esc(item.text) + '</div>' +
+      '<div class="hi-btn">' +
+        '<button class="bd sm" onclick="loadH(' + i + ')">Load</button>' +
+        '<button class="bs sm" onclick="sendH(' + i + ')">📤 Telegram</button>' +
+        '<button class="bg sm" onclick="copyH(' + i + ')">Copy</button>' +
+        '<button class="bw sm" onclick="delH(' + i + ')">✕</button>' +
+      '</div></div>';
+  }).join('');
+}
+
+function copyH(i) {
+  var h = readHist();
+  var text = ((h[i] || {}).text || '').replace(/\r\n/g, '\n');
+  if (!text) return;
+  if (navigator.clipboard && navigator.clipboard.writeText)
+    navigator.clipboard.writeText(text).then(function(){ toast('✅ Copied!'); }).catch(function(){ fallbackCopy(text); });
+  else fallbackCopy(text);
+}
+function sendH(i) {
+  var h = readHist();
+  var text = ((h[i] || {}).text || '').replace(/\r\n/g, '\n');
+  if (!text) return;
+  window.open('https://t.me/share/url?url=&text=' + encodeURIComponent(text), '_blank');
+}
+function loadH(i) {
+  var h = readHist();
+  if (!h[i]) return;
+  if (h[i].form) restore(h[i].form);
+  setTab(h[i].tab || 'M');
+  toast('Loaded!');
+}
+function delH(i) {
+  var h = readHist();
+  h.splice(i, 1);
+  writeHist(h);
+  renderHist();
+}
+
+/* ── clear ─────────────────────────────────────────────── */
+var SEC_IDS = {
+  M: ['mPh','mCh','mGs','mRt','mTp','mRem','mStp','mPkg','mAtt','mLoc','mDl','mLmd','mGeo','mCo','mNcns','mLate','mNet','mLoad','mNotes','mTeam'],
+  P: ['pRem','pStp','pPkg','pAtt','pLoc','pRt','pRea','pUnd','pMis','pRet','pPuf','pInfN','pInfD','pAhd','pAR','pBeh','pResc','pBehN','pARN','pAcc','pNotes'],
+  C: ['cPrePost','cRtsSum','cRtsRet','cRtsGoal','cEvents','cCage','cPh','cCh','cTasks','cPick','cNotes','cInfr','cReset'],
+  G: ['gPuf','gPnov','gCret','gRisk','gAction']
+};
+var SEC_ROWS = {
+  M: ['dTeam','dGeo','dCo','dInfrM'],
+  P: ['dRea','dMis','dInfrP','dAcc'],
+  C: ['dInfrC'],
+  G: []
+};
+
+function clearSec() {
+  (SEC_IDS[currentTab] || []).forEach(function(id){ var e=$(id); if(e) e.value=''; });
+  (SEC_ROWS[currentTab] || []).forEach(function(id){ var e=$(id); if(e) e.innerHTML=''; });
+  save(); render();
+}
+function clearAll() {
+  if (!confirm('Clear all fields? Cannot be undone.')) return;
+  Object.keys(SEC_IDS).forEach(function(t) {
+    SEC_IDS[t].forEach(function(id){ var e=$(id); if(e) e.value=''; });
+    (SEC_ROWS[t] || []).forEach(function(id){ var e=$(id); if(e) e.innerHTML=''; });
+  });
+  save(); render();
+}
+function hardReset() {
+  if (!confirm('Clear all saved data and reload?')) return;
+  try { localStorage.removeItem(LSKEY); localStorage.removeItem(LSHIST); } catch (e) {}
+  location.reload();
+}
+
+/* ── persist / restore ─────────────────────────────────── */
+var ALL_IDS = [
+  'xStnSel','xStnTxt','xDate','xTime',
+  'mPh','mCh','mGs','mRt','mTp','mRem','mStp','mPkg','mAtt','mLoc',
+  'mDl','mLmd','mGeo','mCo','mNcns','mLate','mNet','mLoad','mNotes','mTeam',
+  'pRem','pStp','pPkg','pAtt','pLoc','pRt',
+  'pRea','pUnd','pMis','pRet','pPuf','pInfN','pInfD',
+  'pAhd','pAR','pBeh','pResc','pBehN','pARN','pAcc','pNotes',
+  'cPrePost','cRtsSum','cRtsRet','cRtsGoal','cEvents',
+  'cCage','cPh','cCh','cTasks','cPick','cNotes','cInfr','cReset',
+  'gTime','gSite','gTitle','gIntro','gPuf','gPnov','gCret','gRisk','gAction'
+];
+var CFG_IDS = [
+  'sMTitle','sMEmoji','sPhL','sPhE','sChL','sChE','sGsL','sGsE','sRtL','sRtE',
+  'sTpL','sTpE','sRemML','sRemME','sStpML','sStpME','sPkgML','sPkgME','sAttML','sAttME',
+  'sDlL','sDlE','sGeoL','sGeoE','sCoL','sCoE','sLateL','sLateE','sNetL','sNetE',
+  'sLoadL','sLoadE','sNotesMl','sNotesME',
+  'sPtitle','sPemoji','sRemL','sRemE','sStpL','sStpE','sPkgL','sPkgE','sAttL','sAttE',
+  'sLocL','sLocE','sPkgSL','sPkgSE','sInfrL','sInfrE','sRiskL','sRiskE',
+  'sRescL','sRescE','sBehL','sBehE','sArL','sArE',
+  'sCtitle','sCemoji','sCPhL','sCChL'
+];
+
+function gather() {
+  var d = { tab: currentTab };
+  ALL_IDS.concat(CFG_IDS).forEach(function(id){ var e=$(id); if(e) d[id]=e.value; });
+  d.dTeam  = getNameData('dTeam');
+  d.dGeo   = getNameData('dGeo');
+  d.dCo    = getCoData();
+  d.dRea   = getRowData('dRea');
+  d.dMis   = getRowData('dMis');
+  d.xSpacing = $('xSpacing') ? ($('xSpacing').checked ? 1 : 0) : 0;
+  d.dAcc   = getAccData();
+  d.dInfrM = getInfrData('dInfrM');
+  d.dInfrP = getInfrData('dInfrP');
+  d.dInfrC = getInfrData('dInfrC');
+  return d;
+}
+
+function save() {
+  try { localStorage.setItem(LSKEY, JSON.stringify(gather())); }
+  catch (e) { /* storage unavailable (private mode / file restrictions) — ignore */ }
+}
+
+function restore(d) {
+  if (!d) return;
+  ALL_IDS.concat(CFG_IDS).forEach(function(id){ var e=$(id); if(e&&d[id]!==undefined) e.value=d[id]; });
+  /* station */
+  if ($('xSpacing')) $('xSpacing').checked = (d.xSpacing === undefined) ? true : !!d.xSpacing;
+  if (d.xStnSel) { $('xStnSel').value=d.xStnSel; onStn(d.xStnSel); }
+  if (d.xStnTxt && $('xStnTxt')) $('xStnTxt').value=d.xStnTxt;
+  /* name rows */
+  $('dTeam').innerHTML=''; (d.dTeam||[]).forEach(function(x){ addName('dTeam','mTeam',x); });
+  $('dGeo').innerHTML='';  (d.dGeo||[]).forEach(function(x){ addName('dGeo','mGeo',x); });
+  /* call outs */
+  $('dCo').innerHTML=''; (d.dCo||[]).forEach(function(x){ addCallOut(x); });
+  /* repeat rows */
+  $('dRea').innerHTML=''; (d.dRea||[]).forEach(function(x){ addRow('dRea','R',x); });
+  $('dMis').innerHTML=''; (d.dMis||[]).forEach(function(x){ addRow('dMis','M',x); });
+  /* infraction rows */
+  $('dAcc').innerHTML=''; (d.dAcc||[]).forEach(function(x){ addAcc(x); });
+  $('dInfrM').innerHTML=''; (d.dInfrM||[]).forEach(function(x){ addInfr('dInfrM','mNet',x); });
+  $('dInfrP').innerHTML=''; (d.dInfrP||[]).forEach(function(x){ addInfr('dInfrP','pInfD',x); });
+  $('dInfrC').innerHTML=''; (d.dInfrC||[]).forEach(function(x){ addInfr('dInfrC','cInfr',x); });
+}
+
+function load() {
+  var raw = null;
+  try { raw = localStorage.getItem(LSKEY); } catch (e) { raw = null; }
+  var d = {};
+  if (raw) { try { d = JSON.parse(raw) || {}; } catch (e) { d = {}; } }
+  restore(d);
+  if (!$('xDate').value) {
+    var now = new Date();
+    $('xDate').value = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate());
+  }
+  initSettings();
+  setTab(d.tab || 'M');
+}
+
+/* ── settings sync ─────────────────────────────────────── */
+function initSettings() {
+  document.querySelectorAll('[data-s]').forEach(function(proxy) {
+    var t = $(proxy.getAttribute('data-s'));
+    if (!t) return;
+    proxy.value = t.value;
+    proxy.addEventListener('input', function(){ t.value=proxy.value; save(); render(); });
+  });
+}
+
+var CFG_DEF = {
+  sMTitle:'Morning Report',sMEmoji:'☀️',sPhL:'Phones',sPhE:'📱',sChL:'Chargers',sChE:'🔌',
+  sGsL:'Gas cards',sGsE:'⛽',sRtL:'Routes',sRtE:'🛣️',sTpL:'Total packages today',sTpE:'📦',
+  sRemML:'Remaining packages',sRemME:'❗',sStpML:'Stop progress',sStpME:'🔴',
+  sPkgML:'Package progress',sPkgME:'📬',sAttML:'Attempt success',sAttME:'✅',
+  sDlL:'Daily Log and LMD Max',sDlE:'🗂️',sGeoL:'GEOTAB',sGeoE:'🛰️',
+  sCoL:'Call outs',sCoE:'📞',sLateL:'Late',sLateE:'⏰',sNetL:'Netradyne',sNetE:'🎥',
+  sLoadL:'Load out',sLoadE:'🚚',sNotesMl:'Notes',sNotesME:'📝',
+  sPtitle:'Report',sPemoji:'⏰',sRemL:'Remaining packages',sRemE:'📦',
+  sStpL:'Stop progress',sStpE:'🔴',sPkgL:'Package progress',sPkgE:'📬',
+  sAttL:'Attempt success',sAttE:'✅',sLocL:'Locations progress',sLocE:'📍',
+  sPkgSL:'Package status',sPkgSE:'📌',sInfrL:'Infractions',sInfrE:'🚨',
+  sRiskL:'Risk level',sRiskE:'⚠️',sRescL:'Rescue plan / sweepers',sRescE:'🚚',
+  sBehL:'Behind',sBehE:'🔴',sArL:'At risk',sArE:'🟡',
+  sCtitle:'Closing reports',sCemoji:'🌙',sCPhL:'📱 Phones',sCChL:'🔋 Chargers'
+};
+function resetCfg() {
+  Object.keys(CFG_DEF).forEach(function(k){ var e=$(k); if(e) e.value=CFG_DEF[k]; });
+  document.querySelectorAll('[data-s]').forEach(function(p){ var t=$(p.getAttribute('data-s')); if(t) p.value=t.value; });
+  save(); render(); toast('Defaults restored');
+}
+
+/* ── event delegation ──────────────────────────────────── */
+/* One listener on the document handles all form changes.
+   We skip the output textarea to avoid re-render loops.   */
+document.addEventListener('input', function(e) {
+  var t = e.target;
+  if (t.id === 'output') return;         /* output: only update char count */
+  if (t.id === 'xStnSel') return;        /* handled by onStn inline */
+  if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT') {
+    save(); render();
+  }
+});
+document.addEventListener('change', function(e) {
+  var t = e.target;
+  if (t.id === 'output') return;
+  if (t.id === 'xStnSel') return;
+  if (t.tagName === 'SELECT' || t.type === 'checkbox') { save(); render(); }
+});
+$('output').addEventListener('input', updateCount);
+
+/* ── expose globals FIRST (before any boot code can fail) ── */
+window.showView=showView; window.setTab=setTab; window.showST=showST;
+window.onStn=onStn; window.addTo=addTo; window.setTo=setTo;
+window.addName=addName; window.addCallOut=addCallOut; window.addInfr=addInfr;
+window.addRow=addRow; window.qRow=qRow;
+window.addAcc=addAcc;
+window.render=render; window.doCopy=doCopy; window.sendTelegram=sendTelegram; window.doSave=doSave;
+window.doTxt=doTxt; window.doDupe=doDupe; window.doFixed=doFixed;
+window.clearSec=clearSec; window.clearAll=clearAll; window.hardReset=hardReset;
+window.resetCfg=resetCfg;
+window.autoMorning=autoMorning; window.autoProgress=autoProgress; window.autoGemba=autoGemba;
+window.copyH=copyH; window.sendH=sendH; window.loadH=loadH; window.delH=delH;
+window.syncNames=syncNames;
+
+/* ── boot (wrapped so a failure never kills the app) ────── */
+try { load(); }
+catch (e) {
+  console.error('load() failed:', e);
+  try { setTab('M'); } catch (e2) { console.error('setTab failed:', e2); }
+}
+try { renderHist(); } catch (e) { console.error('renderHist failed:', e); }
+setInterval(function(){ try { updateIndicators(); } catch(e){} }, 2000);
+
+
+})();
+</script>
+</body>
+</html>
